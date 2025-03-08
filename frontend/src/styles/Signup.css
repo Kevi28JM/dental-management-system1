@@ -1,0 +1,109 @@
+/* Full-screen background container */
+.signup-container {
+    height: 100vh;/* Full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #d9afd9, #97d9e1); /* New Gradient */
+    padding: 20px;
+    overflow: hidden;
+  }
+  
+  /* Form card styling */
+  .signup-card {
+    width: 100%;
+    max-width: 400px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Heading styling */
+  .signup-card h3{
+    color: #222;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  /* Input and select fields */
+  .signup-card input,
+  .signup-card select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  
+  /* Adjusting labels */
+  .signup-card label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+  }
+  
+  /* Select dropdown styling */
+  .signup-card select {
+    cursor: pointer;
+  }
+  
+  /* Primary Button Styling */
+  .signup-card .btn-primary {
+    width: 100%;
+    padding: 10px;
+    background: hsl(272, 72%, 59%); /* purple */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+    margin-top: 10px;
+  }
+  
+  .signup-card .btn-primary:hover {
+    background: #53136d; /* Darker Blue */
+  }
+  
+  /* Secondary Button Styling (Find My Account) */
+  .signup-card .btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background: hsl(25, 96%, 61%); /* Orange */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  .signup-card .btn-secondary:hover {
+    background: #9d6725; /* Darker Orange */
+  }
+  
+  /* Responsive Fixes */
+  @media (max-width: 480px) {
+    .signup-card {
+      padding: 20px;
+    }
+  
+    .signup-card input,
+    .signup-card select {
+      font-size: 14px;
+    }
+  
+    .signup-card .btn-primary,
+    .signup-card .btn-secondary {
+      font-size: 14px;
+    }
+  }
