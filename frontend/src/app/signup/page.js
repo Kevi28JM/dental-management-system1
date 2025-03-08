@@ -1,5 +1,5 @@
 // Add this line at the top of your page.js file
-"use client"; 
+"use client"; // Ensures this component runs on the client-side
 
 import { useState } from "react";
 import axios from "axios";
@@ -9,39 +9,46 @@ import "@/styles/Signup.css";  // Import custom styles
 import { ToastContainer } from 'react-toastify';
 
 const signup = () => {
+  // State for user role and form data
   const [role, setRole] = useState("");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
   const [accountExists, setAccountExists] = useState(null);
 
+  // Handle input field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle signup process
   const handleSignup = async (e) => {
     e.preventDefault();
 
+    // New Patient (Temporary Account) - No password required
     if (role === "New Patient (Temporary Account)") {
       try {
         await axios.post("/api/patients/temporary-register", {
           name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-        });
+          phone: formData.phone,// Only phone is required
+          email: formData.email || "", // Send an empty string if email is not provided
+          });
         alert("Temporary account created! You can now book an appointment.");
       } catch (error) {
         alert("Error creating temporary account.");
       }
+    // Existing Patient - Account Verification
     } else if (role === "Patient" && accountExists) {
       try {
         await axios.post("/api/patients/set-password", {
-          email: formData.email,
+          phone: formData.phone, // Use phone as primary identifier
           password: formData.password,
         });
         alert("Account setup completed! You can now log in.");
       } catch (error) {
         alert("Error setting password.");
       }
-    } else {
+    } 
+    // General Signup Process
+    else {
       try {
         await axios.post("/api/signup", formData);
         alert("Account created successfully!");
@@ -51,9 +58,10 @@ const signup = () => {
     }
   };
 
+  // Find Existing Account (Patients)
   const handleFindAccount = async () => {
     try {
-      const response = await axios.post("/api/patients/verify-registered", { email: formData.email });
+      const response = await axios.post("/api/patients/verify-registered", { phone: formData.phone });
       if (response.data.exists) {
         setAccountExists(true);
         alert("Account found! Please create a password.");
@@ -86,18 +94,24 @@ const signup = () => {
           {/* Show fields based on role */}
           {role && (
             <>
+            {/* Full Name */}
               <div className="mb-3">
                 <label className="form-label fw-bold">Full Name</label>
                 <input type="text" className="form-control" name="name" placeholder="Enter your name" onChange={handleChange} required />
               </div>
+              
+              {/* Phone Number (Required) */}
               <div className="mb-3">
-                <label className="form-label fw-bold">Email</label>
-                <input type="email" className="form-control" name="email" placeholder="Enter email" onChange={handleChange} required />
+                <label className="form-label fw-bold">Telephone Number</label>
+                <input type="text" className="form-control" name="phone" placeholder="Enter telephone number" onChange={handleChange} required />
               </div>
+
+              {/* Email (Optional) */}
               <div className="mb-3">
-                <label className="form-label fw-bold">Phone</label>
-                <input type="text" className="form-control" name="phone" placeholder="Enter phone number" onChange={handleChange} required />
+                <label className="form-label fw-bold">Email (Optional)</label>
+                <input type="email" className="form-control" name="email" placeholder="Enter email (If available)" onChange={handleChange} />
               </div>
+             
             </>
           )}
 
