@@ -2,8 +2,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: hsl(272, 72%, 59%);
-    color: white;
+   background-color: lightgray;
+    color: hsl(272, 72%, 59%);
+    border: 2px solid  (272, 72%, 59%);;
     padding: 15px 30px;
   }
   
@@ -18,13 +19,23 @@
     gap: 20px;
   }
   
+  .nav-links li {
+    display: inline;
+  }
   .nav-links li a {
     text-decoration: none;
     color: white;
     font-size: 18px;
+    padding: 10px 20px;
+    background-color: hsl(272, 72%, 59%);
+    border: 2px solid hsl(272, 72%, 59%);
+    border-radius: 25px;
+    transition: background-color 0.3s, color 0.3s;
   }
   
   .nav-links li a:hover {
-    text-decoration: underline;
+    background-color: white;
+    color: hsl(272, 56%, 46%);
+    text-decoration: none;
   }
   
