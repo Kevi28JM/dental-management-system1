@@ -6,6 +6,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Link from "next/link"; // Use next/link for routing in Next.js
 import "@/styles/Signup.css";  // Import custom styles
+import { ToastContainer } from 'react-toastify';
 
 const signup = () => {
   const [role, setRole] = useState("");
