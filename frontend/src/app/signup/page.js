@@ -147,7 +147,7 @@ const signup = () => {
         {/* Login Link (Only for Assistant, Dentist, and Patient) */}
         {role && role !== "New Patient (Temporary Account)" && (
           <p className="login-link mt-3 text-center">
-          Already have an account? <Link href="/login" className="fw-bold text-primary">Login here</Link>
+          Already have an account? <Link href="/login">Login here</Link>
            </p>
 
         )}

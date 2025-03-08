@@ -10,16 +10,18 @@ import { ToastContainer } from 'react-toastify';
 
 
 const login = () => {
-  const [role, setRole] = useState("");
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const router = useRouter(); // For redirection after login
+  const [role, setRole] = useState(""); // State to store selected role
+  const [formData, setFormData] = useState({ phone: "", password: "" }); // State for user input
+  const router = useRouter(); // Next.js router for redirection
 
+  // Handle input field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission for login
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
     try {
       const response = await axios.post(`/api/login`, { role, ...formData });
 
@@ -49,16 +51,18 @@ const login = () => {
             </select>
           </div>
           <div className="mb-3">
-            <label className="form-label fw-bold">Email</label>
+            <label className="form-label fw-bold">Phone Number</label>
             <input
-              type="email"
+              type="text"
               className="form-control"
-              name="email"
-              placeholder="Enter email"
+              name="phone"
+              placeholder="Enter phone number"
               onChange={handleChange}
               required
             />
           </div>
+
+          {/* Password input field */}
           <div className="mb-3">
             <label className="form-label fw-bold">Password</label>
             <input
@@ -70,8 +74,12 @@ const login = () => {
               required
             />
           </div>
+
+          {/* Login button */}
           <button type="submit" className="btn btn-primary w-100">Login</button>
         </form>
+
+        {/* Signup link for new users */}
         <p className="mt-3">
           Don't have an account?{" "}
           <Link href="/signup">Sign Up</Link> {/* Use Next.js Link */}
