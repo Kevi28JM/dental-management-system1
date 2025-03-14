@@ -2,9 +2,9 @@ const db = require('./db');
 
 // Sign up a new user (Create a new user in the database)
 // Here, phone number is compulsory and email is optional
-const createUser = (username, phone, email, passwordHash, callback) => {
-  const query = 'INSERT INTO users (username, phone, email, password) VALUES (?, ?, ?, ?)';
-  db.query(query, [username, phone, email, passwordHash], (err, result) => {
+const createUser = (name, phone, email, passwordHash, callback) => {
+  const query = 'INSERT INTO users (name, phone, email, password) VALUES (?, ?, ?, ?)';
+  db.query(query, [name, phone, email, passwordHash], (err, result) => {
     if (err) {
       console.error('Error creating user:', err);
       return callback(err);
