@@ -1,44 +1,66 @@
 const db = require('./db');
 
 // Sign up a new user (Create a new user in the database)
-// Here, phone number is compulsory and email is optional
-const createUser = (name, phone, email, passwordHash, callback) => {
-  const query = 'INSERT INTO users (name, phone, email, password) VALUES (?, ?, ?, ?)';
-  db.query(query, [name, phone, email, passwordHash], (err, result) => {
-    if (err) {
-      console.error('Error creating user:', err);
-      return callback(err);
-    }
-    callback(null, result);
+// Create a regular user (Dentist, Assistant, or Permanent Patient)
+const createUser = (name, phone, email, passwordHash, role) => {
+  return new Promise((resolve, reject) => {
+    const query = 'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [name, phone, email, passwordHash, role], (err, result) => {
+      if (err) {
+        console.error('Error creating user:', err);
+        return reject(err);  // Reject the promise on error
+      }
+      resolve(result);  // Resolve the promise with the result
+    });
   });
 };
 
+const createTemporaryPatient = (name, phone, email) => {
+  return new Promise((resolve, reject) => {
+    
+    const query = 'INSERT INTO temporary_patients (name, phone, email) VALUES (?, ?, ?)';
+    db.query(query, [name, phone, email], (err, result) => {
+      if (err) {
+        console.error('Error creating temporary patient:', err);
+        return reject(err);  // Reject the promise on error
+      }
+      resolve(result);  // Resolve the promise with the result
+    });
+  });
+};
+
+
 // Find user by phone number (For login)
-const findUserByPhone = (phone, callback) => {
-  const query = 'SELECT * FROM users WHERE phone = ?';
-  db.query(query, [phone], (err, result) => {
-    if (err) {
-      console.error('Error finding user by phone:', err);
-      return callback(err);
-    }
-    callback(null, result[0]);
+const findUserByPhone = (phone) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM users WHERE phone = ?';
+    db.query(query, [phone], (err, result) => {
+      if (err) {
+        console.error('Error finding user by phone:', err);
+        return reject(err);  // Reject the promise on error
+      }
+      resolve(result[0]);  // Resolve with the first result (or null if not found)
+    });
   });
 };
 
 // Find user by email (Optional, For login if email is provided)
-const findUserByEmail = (email, callback) => {
-  const query = 'SELECT * FROM users WHERE email = ?';
-  db.query(query, [email], (err, result) => {
-    if (err) {
-      console.error('Error finding user by email:', err);
-      return callback(err);
-    }
-    callback(null, result[0]);
+const findUserByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT * FROM users WHERE email = ?';
+    db.query(query, [email], (err, result) => {
+      if (err) {
+        console.error('Error finding user by email:', err);
+        return reject(err);  // Reject the promise on error
+      }
+      resolve(result[0]);  // Resolve with the first result (or null if not found)
+    });
   });
 };
 
 module.exports = {
   createUser,
+  createTemporaryPatient,
   findUserByPhone,  // Updated to search by phone
   findUserByEmail,  // Email search still available as optional
 };

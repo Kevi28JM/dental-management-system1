@@ -6,71 +6,127 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Link from "next/link"; // Use next/link for routing in Next.js
 import "@/styles/Signup.css";  // Import custom styles
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const signup = () => {
   // State for user role and form data
   const [role, setRole] = useState("");
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", password: "" });
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    phone: "",
+    email: "", 
+    password: "" 
+  });
   const [accountExists, setAccountExists] = useState(null);
 
   // Handle input field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+ //validating form data
+  const validateForm = () => {
+    if (!role){
+      toast.error("Please select a role");
+      return false
+    }
+    if (!formData.name.trim()){
+      toast.error("Name is required");
+      return false;
+    }
+    if(!formData.phone){
+      toast.error("Phone number is required");  
+      return false;
+    }
+    if(!/^\d{10}$/.test(formData.phone)){
+      toast.error("Phone number must be 10 digits");
+      return false;
+    }
+    if(formData.email && !formData.email.trim()){
+      toast.error("Email is required");
+      return false;
+    }
+    if(formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)){
+      toast.error("Invalid email address");
+      return false;
+    }
+    if(role !== "New Patient (Temporary Account)" && !formData.password){
+      toast.error("Password is required");
+      return false;
+    }
+    if(role === "Patient" && accountExists && !formData.password){
+      toast.error("Password is required");
+      return false;
+    }
+    /*if(role === "Patient" && !accountExists){
+      toast.error("Please find your account first");
+      return false;
+    }*/
+    if(role !== "New Patient (Temporary Account)" && formData.password.length < 8){
+      toast.error("Password must be at least 8 characters");
+      return false;
+    }
+    //additional validation for dentist and assistant passwords
+    if(role === "Dentist" && !formData.password.startsWith("DENT")){
+      toast.error("Dentist password must start with 'DENT'");
+      return false;
+    }
+    if(role === "Assistant" && !formData.password.startsWith("ASST")){
+      toast.error("Assistant password must start with 'ASST'");
+      return false;
+    }
+    return true;
+  };
   // Handle signup process
   const handleSignup = async (e) => {
     e.preventDefault();
 
+    if(!validateForm()){
+      console.log("Validation failed, signup request not sent.");
+      return;   //validate form before proceeding
+    }
+
     // New Patient (Temporary Account) - No password required
-    if (role === "New Patient (Temporary Account)") {
-      try {
-        await axios.post("/api/patients/temporary-register", {
+    try {
+      if (role === "New Patient (Temporary Account)") {
+         await axios.post("/api/patients/temporary-register", {
           name: formData.name,
           phone: formData.phone,// Only phone is required
           email: formData.email || "", // Send an empty string if email is not provided
           });
-        alert("Temporary account created! You can now book an appointment.");
-      } catch (error) {
-        alert("Error creating temporary account.");
-      }
-    // Existing Patient - Account Verification
-    } else if (role === "Patient" && accountExists) {
-      try {
+        toast.success("Temporary account created! You can now book an appointment.");
+      } else if (role === "Patient" && accountExists) {
+      // Existing Patient - Account Verification set password
         await axios.post("/api/patients/set-password", {
           phone: formData.phone, // Use phone as primary identifier
           password: formData.password,
         });
-        alert("Account setup completed! You can now log in.");
-      } catch (error) {
-        alert("Error setting password.");
-      }
-    } 
-    // General Signup Process
-    else {
-      try {
-        await axios.post("/api/signup", formData);
-        alert("Account created successfully!");
-      } catch (error) {
-        alert("Error signing up.");
-      }
+        toast.success("Account setup completed! You can now log in.");
+      } else {   
+    // General Signup Process for Assistant ,Dentist and patients
+       const response = await axios.post("http://localhost:5000/api/signup", formData);
+        toast.success("Account created successfully!");
+      } 
+    }catch (error) {
+      console.error("Signup error:", error.response?.data || error.message);
+        toast.error("Error signing up.");
+      
     }
   };
 
-  // Find Existing Account (Patients)
+  // Function to check if a patient already has an account
   const handleFindAccount = async () => {
     try {
       const response = await axios.post("/api/patients/verify-registered", { phone: formData.phone });
       if (response.data.exists) {
         setAccountExists(true);
-        alert("Account found! Please create a password.");
+        toast.info("Account found! Please create a password.");
       } else {
         setAccountExists(false);
-        alert("No registered account found. Please visit the clinic to get registered.");
+        toast.error("No registered account found. Please visit the clinic to get registered.");
       }
     } catch (error) {
-      alert("Error verifying account.");
+      toast.error("Error verifying account.");
     }
   };
 

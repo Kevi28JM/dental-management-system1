@@ -4,8 +4,10 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/user");// Import user model
 const db = require("../models/db");
 
+//use express validator to sanitize the input
 const router = express.Router();
-
+const { body, validationResult } = require("express-validator");
+/*
 // Fetch all users
 router.get("/", (req, res) => {
     db.query("SELECT * FROM users", (err, results) => {
@@ -22,29 +24,66 @@ router.post("/", (req, res) => {
         res.json({ message: "User added successfully", id: result.insertId });
     });
 });
-
-// Sign Up Route
-router.post("/signup", (req, res) => {
-    const { name, phone, email, password } = req.body;
-
-    if (!phone) {
-        return res.status(400).json({ message: "Phone number is required" });
+*/
+// Signup Route
+router.post(
+    "/signup",
+    [
+      // Validate email format
+      body("email").isEmail().withMessage("Invalid email format"),
+  
+      // Validate password (optional for temporary patients)
+      body("password")
+        .optional()
+        .isLength({ min: 8 })
+        .withMessage("Password must be at least 8 characters long"),
+  
+      // Role selection is required
+      body("role").notEmpty().withMessage("Role is required"),
+    ],
+    async (req, res) => {
+      // Prevent caching for security
+      res.set("Cache-Control", "no-store, must-revalidate");
+  
+      // Check for validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+  
+      try {
+        // Extract data from request body
+        const { name, phone, email, password, role } = req.body;
+  
+        // Check if the phone number is already registered
+        const existingUser = await userModel.findUserByPhone(phone);
+        if (existingUser) {
+          return res.status(400).json({ message: "Phone number already registered" });
+        }
+  
+        // If the role is 'temporary_patient', create a temporary account
+        if (role === "temporary_patient") {
+          // Temporary patients do not require a password
+          await userModel.createTemporaryPatient(name, phone, email || null,(err, result) => {
+            if (err) {
+              return res.status(500).json({ message: "Error creating temporary account", error: err.message });
+            }
+            return res.status(201).json({ message: "Temporary account created successfully" });
+          });
+        } else {
+          // Hash the password for security (only for regular users)
+          const hashedPassword = await bcrypt.hash(password, 10);
+  
+          // Store user details in the database
+          await userModel.createUser(name, phone, email || null, hashedPassword, role);
+          return res.status(201).json({ message: "User registered successfully" });
+        }
+      } catch (err) {
+        // Handle server errors
+        return res.status(500).json({ message: "Error signing up", error: err.message });
+      }
     }
-
-    userModel.findUserByPhone(phone, (err, existingUser) => {
-        if (err) return res.status(500).json({ message: "Internal Server Error" });
-        if (existingUser) return res.status(400).json({ message: "User already exists" });
-
-        bcrypt.hash(password, 10, (err, hashedPassword) => {
-            if (err) return res.status(500).json({ message: "Error hashing password" });
-
-            userModel.createUser(name, phone, email || null, hashedPassword, (err) => {
-                if (err) return res.status(500).json({ message: "Error saving user" });
-                res.status(201).json({ message: "User created successfully" });
-            });
-        });
-    });
-});
+  );
 
 // Login Route
 router.post("/login", (req, res) => {
