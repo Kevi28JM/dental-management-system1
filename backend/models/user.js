@@ -1,20 +1,27 @@
 const db = require('./db');
 
-// Sign up a new user (Create a new user in the database)
-// Create a regular user (Dentist, Assistant, or Permanent Patient)
-const createUser = (name, phone, email, passwordHash, role) => {
-  return new Promise((resolve, reject) => {
-    const query = 'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)';
-    db.query(query, [name, phone, email, passwordHash, role], (err, result) => {
-      if (err) {
-        console.error('Error creating user:', err);
-        return reject(err);  // Reject the promise on error
-      }
-      resolve(result);  // Resolve the promise with the result
-    });
-  });
-};
 
+// Sign up a new user (Create a new user in the database)
+const createUser = async (name, phone, email, passwordHash, role) => {
+  try {
+    // Check if user already exists before inserting
+    const existingUsers = await db.cool('SELECT * FROM users WHERE phone = ?', [phone]);
+    if (existingUsers.length > 0) {
+      throw { message: 'Phone number already registered' };
+    }
+
+    // Insert new user
+    const result = await db.cool(
+      'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)',
+      [name, phone, email || null, passwordHash, role]
+    );
+    return { message: 'User created successfully', userId: result.insertId };
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw { message: 'Database error', error };
+  }
+};
+/*
 const createTemporaryPatient = (name, phone, email) => {
   return new Promise((resolve, reject) => {
     
@@ -28,39 +35,34 @@ const createTemporaryPatient = (name, phone, email) => {
     });
   });
 };
-
+*/
 
 // Find user by phone number (For login)
-const findUserByPhone = (phone) => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM users WHERE phone = ?';
-    db.query(query, [phone], (err, result) => {
-      if (err) {
-        console.error('Error finding user by phone:', err);
-        return reject(err);  // Reject the promise on error
-      }
-      resolve(result[0]);  // Resolve with the first result (or null if not found)
-    });
-  });
+const findUserByPhone = async (phone,role) => {
+  try {
+    const result = await db.cool('SELECT * FROM users WHERE phone = ? AND role = ?', [phone,role ]);
+    console.log("Database Query Result:", result);
+    return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
+  } catch (error) {
+    console.error('Error finding user by phone:', error);
+    throw { message: 'Database error', error };
+  }
 };
 
 // Find user by email (Optional, For login if email is provided)
-const findUserByEmail = (email) => {
-  return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM users WHERE email = ?';
-    db.query(query, [email], (err, result) => {
-      if (err) {
-        console.error('Error finding user by email:', err);
-        return reject(err);  // Reject the promise on error
-      }
-      resolve(result[0]);  // Resolve with the first result (or null if not found)
-    });
-  });
+const findUserByEmail = async (email) => {
+  try {
+    const result = await db.cool('SELECT * FROM users WHERE email = ?', [email]);
+    return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
+  } catch (error) {
+    console.error('Error finding user by email:', error);
+    throw { message: 'Database error', error };
+  }
 };
 
 module.exports = {
   createUser,
-  createTemporaryPatient,
+  /*createTemporaryPatient,*/
   findUserByPhone,  // Updated to search by phone
   findUserByEmail,  // Email search still available as optional
 };

@@ -23,7 +23,7 @@ const login = () => {
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
     try {
-      const response = await axios.post(`/api/login`, { role, ...formData });
+      const response = await axios.post(`http://localhost:5000/api/users/login`, { role, ...formData });
 
       if (response.data.success) {
         alert("Login successful!");

@@ -42,15 +42,12 @@ const signup = () => {
       toast.error("Phone number must be 10 digits");
       return false;
     }
-    if(formData.email && !formData.email.trim()){
-      toast.error("Email is required");
-      return false;
-    }
+     
     if(formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)){
       toast.error("Invalid email address");
       return false;
     }
-    if(role !== "New Patient (Temporary Account)" && !formData.password){
+    if(!formData.password){
       toast.error("Password is required");
       return false;
     }
@@ -58,14 +55,20 @@ const signup = () => {
       toast.error("Password is required");
       return false;
     }
-    /*if(role === "Patient" && !accountExists){
+    if(role === "Patient" && !accountExists){
       toast.error("Please find your account first");
       return false;
-    }*/
-    if(role !== "New Patient (Temporary Account)" && formData.password.length < 8){
+    }
+    /*if(role !== "New Patient (Temporary Account)" && formData.password.length < 8){
       toast.error("Password must be at least 8 characters");
       return false;
-    }
+    }*/
+
+      if (!formData.password || formData.password.length < 8) {
+        toast.error("Password must be at least 8 characters");
+        return false;
+      }
+
     //additional validation for dentist and assistant passwords
     if(role === "Dentist" && !formData.password.startsWith("DENT")){
       toast.error("Dentist password must start with 'DENT'");
@@ -86,6 +89,7 @@ const signup = () => {
       return;   //validate form before proceeding
     }
 
+    /*
     // New Patient (Temporary Account) - No password required
     try {
       if (role === "New Patient (Temporary Account)") {
@@ -102,20 +106,28 @@ const signup = () => {
           password: formData.password,
         });
         toast.success("Account setup completed! You can now log in.");
-      } else {   
-    // General Signup Process for Assistant ,Dentist and patients
-       const response = await axios.post("http://localhost:5000/api/signup", formData);
-        toast.success("Account created successfully!");
-      } 
-    }catch (error) {
-      console.error("Signup error:", error.response?.data || error.message);
-        toast.error("Error signing up.");
+      } else {  */
+       
       
+    // General Signup Process for Assistant ,Dentist and patients
+    try {
+      const response = await axios.post("http://localhost:5000/api/users/signup", { role, ...formData });
+      if (response.status === 201) {
+        toast.success("Signup successful! You can now log in.");
+        console.log("Signup success:", response.data);
+      } else {
+        toast.error("Signup failed. Please try again.");
+        console.error("Unexpected response:", response);
+      }
+    } catch (error) {
+      console.error("Signup error:", error.response ? error.response.data : error);
+      toast.error(error.response?.data?.message || "Signup failed. Please try again.");
     }
   };
 
   // Function to check if a patient already has an account
   const handleFindAccount = async () => {
+    if (role !== "Patient") return; // Prevent running for other roles
     try {
       const response = await axios.post("/api/patients/verify-registered", { phone: formData.phone });
       if (response.data.exists) {
@@ -143,7 +155,7 @@ const signup = () => {
               <option value="Assistant">Assistant</option>
               <option value="Dentist">Dentist</option>
               <option value="Patient">Patient</option>
-              <option value="New Patient (Temporary Account)">New Patient (Temporary Account)</option>
+            {/* <option value="New Patient (Temporary Account)">New Patient (Temporary Account)</option>*/}
             </select>
           </div>
 
@@ -200,13 +212,10 @@ const signup = () => {
           <button type="submit" className="btn btn-primary w-100">Sign Up</button>
         </form>
 
-        {/* Login Link (Only for Assistant, Dentist, and Patient) */}
-        {role && role !== "New Patient (Temporary Account)" && (
-          <p className="login-link mt-3 text-center">
+        {/* Login Link  for Assistant, Dentist, and Patient */}
+        <p className="login-link mt-3 text-center">
           Already have an account? <Link href="/login">Login here</Link>
-           </p>
-
-        )}
+        </p>
       </div>
     </div>
   );
