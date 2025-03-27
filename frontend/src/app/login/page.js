@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import Link from "next/link"; // Import Link from Next.js
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/styles/Login.css"; // Import custom styles
-import { ToastContainer } from 'react-toastify';
-
+import { ToastContainer , toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const login = () => {
   const [role, setRole] = useState(""); // State to store selected role
@@ -22,22 +22,27 @@ const login = () => {
   // Handle form submission for login
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
+    
     try {
       const response = await axios.post(`http://localhost:5000/api/users/login`, { role, ...formData });
 
       if (response.data.success) {
-        alert("Login successful!");
-        router.push("/dashboard"); // Redirect to the dashboard after login
+        toast.success("Login successful! Redirecting...", { autoClose: 2000 });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
       } else {
-        alert("Invalid credentials. Please try again.");
+        toast.error("Invalid credentials. Please try again.");
       }
     } catch (error) {
-      alert("Error logging in. Please check your credentials.");
+      toast.error("Login failed. Check your credentials and try again.");
     }
   };
 
   return (
     <div className="login-container">
+    <ToastContainer position="top-right" /> {/* Toast Notification Container */}
+
       <div className="login-card">
         <h3>Login</h3>
         <form onSubmit={handleLogin}>
