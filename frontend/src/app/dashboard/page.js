@@ -29,16 +29,20 @@ const AssistantDashboard = () => {
       {/* Sidebar Menu */}
       <ul className="sidebar-menu">
           <li className={pathname === "/dashboard" ? "active" : ""}>
-            <Link href="/dashboard">🏠 Dashboard</Link>
+            <Link href="/dashboard">
+            <img src="/dashboard_icon.png" alt="dashboard icon" className="dashboard-logo"/>  Dashboard</Link>
           </li>
           <li className={pathname === "/patient-register" ? "active" : ""}>
-            <Link href="/patient-register">📁 Patient Register</Link>
+            <Link href="/patient-register">
+            <img src="/patient_icon.png" alt="patient icon" className="patient-logo"/>  Patient Register</Link>
           </li>
           <li className={pathname === "/appointments" ? "active" : ""}>
-            <Link href="/appointments">    📅 Appointments</Link>
+            <Link href="/appointments">     
+            <img src="/appointment_icon.png" alt="appointment icon" className="appointment-logo"/>  Appointments</Link>
           </li>
           <li className={pathname === "/inventory" ? "active" : ""}>
-            <Link href="/inventory">       💬 Inventory</Link>
+            <Link href="/inventory"> 
+            <img src="/inventory_icon.png" alt="inventory icon" className="inventory-logo"/>  Inventory</Link>
           </li>
         </ul>
       </aside>

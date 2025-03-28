@@ -14,7 +14,7 @@
 
   .sidebar-header {
 
-    background-color: #f4ebeb; /* White or any color you prefer */
+    background-color: #fcfcfc; /* White or any color you prefer */
     padding: 10px;
     display: flex;
     align-items: center;
@@ -38,6 +38,29 @@
   padding: 0;
 }
 
+.dashboard-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+.patient-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+.appointment-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+.inventory-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
 .sidebar-menu li {
   padding: 15px;
   border-radius: 0;
@@ -72,6 +95,7 @@
     justify-content: space-between;
     align-items: center;
   }
+
   
   .profile-pic {
     width: 40px;
