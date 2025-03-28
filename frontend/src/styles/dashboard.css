@@ -32,18 +32,34 @@
     margin-left: 10px;
   }
   
-  
-  
-  .sidebar ul {
-    font-size: 15px;
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar li {
-    margin: 15px 0;
-    cursor: pointer;
-  }
+  /* Sidebar Menu */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  padding: 15px;
+  border-radius: 0;
+  transition: background 0.3s ease;
+}
+
+.sidebar-menu li a {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  display: block;
+}
+
+.sidebar-menu li:hover {
+  background: #c7b7e2;
+}
+
+/* Highlight Active Page */
+.sidebar-menu .active {
+  background: #463366;
+  font-weight: bold;
+}
   
   .main-content {
     flex: 1;

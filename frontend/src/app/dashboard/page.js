@@ -3,9 +3,13 @@
 import "@/styles/dashboard.css";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation"; // Detects current page
 
 const AssistantDashboard = () => {
   const router = useRouter();
+  const pathname = usePathname(); // Get current route
+  
 /*
   useEffect(() => {
     const role = localStorage.getItem("role");
@@ -20,14 +24,22 @@ const AssistantDashboard = () => {
       <div className="sidebar-header">
       <span className="sidebar-title">Family Dental Surgery</span>
       <img src="/logo.png" alt="Dental Logo" className="sidebar-logo" />
-        
       </div> 
-        <ul>
-          <li>🏠 Home</li>
-          <li>📁 Project</li>
-          <li>📅 Calendar</li>
-          <li>💬 Team Chat</li>
-          <li>⚙️ Settings</li>
+
+      {/* Sidebar Menu */}
+      <ul className="sidebar-menu">
+          <li className={pathname === "/dashboard" ? "active" : ""}>
+            <Link href="/dashboard">🏠 Dashboard</Link>
+          </li>
+          <li className={pathname === "/patient-register" ? "active" : ""}>
+            <Link href="/patient-register">📁 Patient Register</Link>
+          </li>
+          <li className={pathname === "/appointments" ? "active" : ""}>
+            <Link href="/appointments">    📅 Appointments</Link>
+          </li>
+          <li className={pathname === "/inventory" ? "active" : ""}>
+            <Link href="/inventory">       💬 Inventory</Link>
+          </li>
         </ul>
       </aside>
 
