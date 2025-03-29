@@ -5,13 +5,13 @@ const db = require('./db');
 const createUser = async (name, phone, email, passwordHash, role) => {
   try {
     // Check if user already exists before inserting
-    const existingUsers = await db.cool('SELECT * FROM users WHERE phone = ?', [phone]);
+    const existingUsers = await db.queryDB('SELECT * FROM users WHERE phone = ?', [phone]);
     if (existingUsers.length > 0) {
       throw { message: 'Phone number already registered' };
     }
 
     // Insert new user
-    const result = await db.cool(
+    const result = await db.queryDB(
       'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)',
       [name, phone, email || null, passwordHash, role]
     );
@@ -40,7 +40,7 @@ const createTemporaryPatient = (name, phone, email) => {
 // Find user by phone number (For login)
 const findUserByPhone = async (phone,role) => {
   try {
-    const result = await db.cool('SELECT * FROM users WHERE phone = ? AND role = ?', [phone,role ]);
+    const result = await db.queryDB('SELECT * FROM users WHERE phone = ? AND role = ?', [phone,role ]);
     console.log("Database Query Result:", result);
     return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
   } catch (error) {
@@ -52,7 +52,7 @@ const findUserByPhone = async (phone,role) => {
 // Find user by email (Optional, For login if email is provided)
 const findUserByEmail = async (email) => {
   try {
-    const result = await db.cool('SELECT * FROM users WHERE email = ?', [email]);
+    const result = await db.queryDB('SELECT * FROM users WHERE email = ?', [email]);
     return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
   } catch (error) {
     console.error('Error finding user by email:', error);

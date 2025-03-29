@@ -14,7 +14,7 @@ const pool = mysql.createPool({
 });
 
 // Promise wrapper for executing queries using `db.cool`
-const cool = (query, params = []) => {
+const queryDB = (query, params = []) => {
     return pool.promise().query(query, params).then(([rows]) => rows);
 };
 
@@ -28,4 +28,4 @@ pool.getConnection((err, connection) => {
     }
 });
 
-module.exports = { cool };
+module.exports = { queryDB, pool };
