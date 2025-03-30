@@ -1,8 +1,11 @@
 "use client"; // Ensure this is a client-side component
-
+ import axios from "axios";
  import {useState, useEffect} from "react";
  import "@/styles/patient-register.css"; // Import custom styles
  import "@/styles/dashboard.css"; // Import custom styles
+ import AssistSidebar from "@/components/AssistSidebar"; // Import the sidebar component
+ import { toast, ToastContainer } from 'react-toastify';
+ import 'react-toastify/dist/ReactToastify.css';
 
  const PatientManagement = () => {
     const [patients, setPatients] = useState([]);
@@ -24,13 +27,26 @@
   
     const fetchPatients = async () => {
       try {
-        const response = await fetch("/api/patients");
-        const data = await response.json();
-        setPatients(data);
+        const response = await axios.get("http://localhost:5000/api/patients/");
+        
+        console.log("API Response:", response.data); // Debugging line
+      
+        if (Array.isArray(response.data.patients)) {
+          setPatients(response.data.patients);
+          toast.success("Patients data loaded successfully!");
+        } else {
+          console.error("Unexpected response format:", response.data);
+          setPatients([]); // Prevent errors
+          toast.error("Failed to load patients. Unexpected response format.");
+        }
       } catch (error) {
         console.error("Error fetching patients:", error);
+        setPatients([]);
+        toast.error(error.response?.data?.message || "Error fetching patients. Please try again.");
       }
+      
     };
+    
   
     const handleSearch = (e) => {
       setSearchQuery(e.target.value);
@@ -46,25 +62,24 @@
       setNewPatient({ ...newPatient, [e.target.name]: e.target.value });
     };
   
+    
     const handleRegisterPatient = async (e) => {
       e.preventDefault();
       try {
-        const response = await fetch("/api/patients", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newPatient),
-        });
-        if (response.ok) {
-          alert("Patient Registered Successfully!");
+        const response = await axios.post("http://localhost:5000/api/patients/add", newPatient);
+      
+        if (response.status === 201) {
+          toast.success("Patient registered successfully!");
           setShowModal(false);
           fetchPatients();
         } else {
-          alert("Error registering patient");
+          toast.error("Error registering patient: " + response.data.message);
         }
       } catch (error) {
         console.error("Registration Error:", error);
-        alert("Server error! Try again later.");
+        toast.error(error.response?.data?.message || "Server error! Try again later.");
       }
+      
     };
   
     return (

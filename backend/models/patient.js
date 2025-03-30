@@ -1,12 +1,15 @@
 const db= require('./db');//import the database connection
 
-const createPatient = async (firstName,lastName, dob, gender, findUserByPhone, findUserByEmail, address) =>{
+const createPatient = async (firstName,lastName, dob, gender, phone, email, address) =>{
     try{
         //insert new patient into the database (patient id id auto generated)
         const result = await db.queryDB(
-            "INSERT INTO patients (first_name, last_name, dob, gender, phone, email, address) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO patients (firstName, lastName, dob, gender, phone, email, address) VALUES (?, ?, ?, ?, ?, ?, ?)",
             [firstName, lastName, dob, gender, phone || null, email || null, address]
         );
+        if (!result.insertId) {
+            throw new Error("Failed to insert patient");
+        }
         return { message: "Patient registered successfully", patientId: result.insertId };
         }catch (error) {
             console.error("Error creating patient:", error);

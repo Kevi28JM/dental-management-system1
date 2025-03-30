@@ -20,6 +20,10 @@ app.get("/", (req, res) => {
 const userRoutes = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);
 
+// Import patient routes
+const patientRoutes = require("./routes/patientRoutes");
+app.use("/api/patients", patientRoutes);
+
 const PORT = process.env.PORT || 5000;
 // Start the server
 app.listen(PORT, () => {
