@@ -89,15 +89,26 @@
       {/* Main Content */}
       <div className="patient-management-container">
         <h2>Patient Management</h2>
+
+        <div className="top-section">
         <input
           type="text"
           placeholder="Search patients..."
           value={searchQuery}
           onChange={handleSearch}
+          className="search-bar"
         />
+
+        <button className="add-btn" onClick={() => setShowModal(true)}>
+          ➕ Add Patient
+        </button>
+        </div>
+
+        <div className="table-container">
         <table>
           <thead>
             <tr>
+              <th>ID</th>
               <th>First Name</th>
               <th>Last Name</th>
               <th>DOB</th>
@@ -107,9 +118,12 @@
               <th>Address</th>
             </tr>
           </thead>
-          <tbody>
+           
+
+          <tbody className="table-body">
             {filteredPatients.map((patient) => (
               <tr key={patient.id}>
+                <td>{patient.id}</td>
                 <td>{patient.firstName}</td>
                 <td>{patient.lastName}</td>
                 <td>{patient.dob}</td>
@@ -121,9 +135,7 @@
             ))}
           </tbody>
         </table>
-        <button className="add-btn" onClick={() => setShowModal(true)}>
-          ➕ Add Patient
-        </button>
+        </div>
 
         {showModal && (
           <div className="modal">
@@ -147,8 +159,9 @@
             </div>
           </div>
         )}
-      </div>
-      </div>
+        </div>
+       </div>
+       
     );
   };
   

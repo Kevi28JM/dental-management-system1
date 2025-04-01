@@ -7,14 +7,25 @@
 .patient-management-content {
   flex: 1;  /* Takes remaining space */
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+   
 }
-  
-  h2 {
+
+/* Top Section: Search & Add Button */
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+}
+h2 {
     text-align: center;
     color: #3f454b;
     font-style: bold;
   }
-  
+   
   /* Search Bar */
   input[type="text"] {
     width: 100%;
@@ -25,15 +36,32 @@
     border-radius: 5px;
     font-size: 16px;
   }
+
+/* Scrollable Table */
+.table-container {
+  border: 1px solid #ddd;
+  max-height: calc(100vh - 150px); /* Adjust height */
+  overflow-y: auto;
+  position: relative;
+}
   
-  /* Table Styles */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    margin-left: 5px;
-  }
-  
+  /* Table Header (Fixed) */
+thead {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+}
+
+  /* Scrollable Table Body */
+.table-body {
+  max-height: 400px; /* Adjust as needed */
+  overflow-y: auto;
+   
+}
+
+ 
+
   th, td {
     border: 1px solid #ddd;
     padding: 10px;
@@ -49,12 +77,14 @@
   .add-btn {
     background-color: hsl(272, 52%, 35%);
     color: white;
+    align-items: center;
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-right: 5px;
     margin-left: 5px;
   }
   
