@@ -83,6 +83,10 @@
     };
   
     return (
+      <div className="patient-register-container">
+      <AssistSidebar/> {/* Sidebar component */}
+
+      {/* Main Content */}
       <div className="patient-management-container">
         <h2>Patient Management</h2>
         <input
@@ -120,6 +124,7 @@
         <button className="add-btn" onClick={() => setShowModal(true)}>
           ➕ Add Patient
         </button>
+
         {showModal && (
           <div className="modal">
             <div className="modal-content">
@@ -142,6 +147,7 @@
             </div>
           </div>
         )}
+      </div>
       </div>
     );
   };

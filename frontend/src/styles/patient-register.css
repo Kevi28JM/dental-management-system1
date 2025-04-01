@@ -1,14 +1,18 @@
+.patient-register-container {
+  display: flex;  /* Enables side-by-side layout */
+  height: 100vh;
+}
+
 /* Container Styles */
-.patient-management-container {
-    max-width: 90%;
-    margin: auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
+.patient-management-content {
+  flex: 1;  /* Takes remaining space */
+  padding: 20px;
+}
   
   h2 {
     text-align: center;
     color: #3f454b;
+    font-style: bold;
   }
   
   /* Search Bar */
@@ -16,6 +20,7 @@
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
+    margin-left: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
@@ -26,6 +31,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    margin-left: 5px;
   }
   
   th, td {
@@ -49,6 +55,7 @@
     cursor: pointer;
     font-size: 16px;
     margin-top: 15px;
+    margin-left: 5px;
   }
   
   .add-btn:hover {
@@ -100,7 +107,7 @@
   }
   
   .modal-content button[type="submit"] {
-    background-color: hsl(272, 82%, 66%);
+    background-color: hsl(130, 61%, 43%);
     color: white;
   }
   
