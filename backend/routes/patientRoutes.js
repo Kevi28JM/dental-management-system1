@@ -54,5 +54,23 @@ router.get("/", async (req, res) => {  //route to fetch all patients from the da
       res.status(500).json({ message: "Error fetching patients", error: error.message });
     }
   });
+
+// Route to update patient details
+router.put("/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, dob, gender, phone, email, address } = req.body;
+
+  if (!firstName || !lastName || !dob || !gender || !phone || !address) {
+      return res.status(400).json({ message: "All patient fields are required" });
+  }
+
+  try {
+      const result = await patientModel.updatePatient(id, firstName, lastName, dob, gender, phone, email, address);
+      res.status(200).json({ success: true, message: "Patient updated successfully", result });
+  } catch (error) {
+      console.error("Error updating patient:", error);
+      res.status(500).json({ success: false, message: "Error updating patient", error });
+  }
+});  
   
   module.exports = router;

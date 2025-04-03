@@ -40,5 +40,20 @@ const searchPatientsByName = async (searchQuery) => {
     }
 };
 
+const updatePatient = async (id, firstName, lastName, dob, gender, phone, email, address) => {
+    try {
+        const result = await db.queryDB(
+            "UPDATE patients SET firstName=?, lastName=?, dob=?, gender=?, phone=?, email=?, address=? WHERE id=?",
+            [firstName, lastName, dob, gender, phone || null, email || null, address, id]
+        );
+        if (result.affectedRows === 0) {
+            throw new Error("No patient found with the given ID");
+        }
+        return { message: "Patient updated successfully" };
+    } catch (error) {
+        console.error("Error updating patient:", error);
+        throw { message: "Database error", error };
+    }
+};
 
-module.exports = {createPatient, getAllPatients, searchPatientsByName};
+module.exports = {createPatient, getAllPatients, searchPatientsByName, updatePatient};

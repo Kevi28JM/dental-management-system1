@@ -95,7 +95,7 @@
 
   const handleUpdatePatient = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/patients/${selectedPatient.id}`, selectedPatient);
+      await axios.put(`http://localhost:5000/api/patients/update/${selectedPatient.id}`, selectedPatient);
       toast.success("Patient updated successfully!");
       setShowEditModal(false);
       fetchPatients();
@@ -156,7 +156,7 @@
                 <td>{patient.email}</td>
                 <td>{patient.address}</td>
                 <td>
-                    <button onClick={() => handleEditPatient(patient)}>✏️ Edit</button>
+                    <button className="edit-btn" onClick={() => handleEditPatient(patient)}>✏️</button>
                 </td>
               </tr>
             ))}
@@ -202,8 +202,8 @@
               <input type="text" name="phone" value={selectedPatient.phone} onChange={handleEditChange} required />
               <input type="email" name="email" value={selectedPatient.email} onChange={handleEditChange} required />
               <textarea name="address" value={selectedPatient.address} onChange={handleEditChange} required />
-              <button onClick={handleUpdatePatient}>Update</button>
-              <button onClick={() => setShowEditModal(false)}>Cancel</button>
+              <button className="update-btn" onClick={handleUpdatePatient}>Update</button>
+              <button className="cancel-btn" onClick={() => setShowEditModal(false)}>Cancel</button>
             </div>
           </div>
         )}

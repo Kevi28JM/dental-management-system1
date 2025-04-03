@@ -44,6 +44,7 @@ h2 {
   max-height: calc(100vh - 150px); /* Adjust height */
   overflow-y: auto;
   position: relative;
+  margin-left: 5px;
 }
   
   /* Table Header (Fixed) */
@@ -52,13 +53,14 @@ thead {
   top: 0;
   background-color: white;
   z-index: 10;
+  font-size: 14px;
 }
 
   /* Scrollable Table Body */
 .table-body {
   max-height: 400px; /* Adjust as needed */
   overflow-y: auto;
-   
+   font-size: 14px;
 }
 
  
@@ -151,3 +153,22 @@ thead {
     opacity: 0.8;
   }
   
+  .edit-btn {
+     
+    color: white;
+    padding: 5px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.update-btn {
+    background-color: hsl(130, 61%, 43%);
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #f54d4d;
+    color: white;
+}
