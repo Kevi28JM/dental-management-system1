@@ -11,6 +11,9 @@
     const [patients, setPatients] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+
     const [newPatient, setNewPatient] = useState({
       firstName: "",
       lastName: "",
@@ -62,6 +65,10 @@
       setNewPatient({ ...newPatient, [e.target.name]: e.target.value });
     };
   
+
+    const handleEditChange = (e) => {
+      setSelectedPatient({ ...selectedPatient, [e.target.name]: e.target.value });
+    };
     
     const handleRegisterPatient = async (e) => {
       e.preventDefault();
@@ -79,8 +86,24 @@
         console.error("Registration Error:", error);
         toast.error(error.response?.data?.message || "Server error! Try again later.");
       }
-      
-    };
+      };
+
+      const handleEditPatient = (patient) => {
+        setSelectedPatient(patient);
+        setShowEditModal(true);
+  };
+
+  const handleUpdatePatient = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/patients/${selectedPatient.id}`, selectedPatient);
+      toast.success("Patient updated successfully!");
+      setShowEditModal(false);
+      fetchPatients();
+    } catch (error) {
+      console.error("Update Error:", error);
+      toast.error("Failed to update patient.");
+    }
+  };
   
     return (
       <div className="patient-register-container">
@@ -116,6 +139,7 @@
               <th>Phone</th>
               <th>Email</th>
               <th>Address</th>
+              <th>Actions</th>
             </tr>
           </thead>
            
@@ -131,6 +155,9 @@
                 <td>{patient.phone}</td>
                 <td>{patient.email}</td>
                 <td>{patient.address}</td>
+                <td>
+                    <button onClick={() => handleEditPatient(patient)}>✏️ Edit</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -159,6 +186,29 @@
             </div>
           </div>
         )}
+
+        {showEditModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>Edit Patient</h3>
+              <input type="text" name="firstName" value={selectedPatient.firstName} onChange={handleEditChange} required />
+              <input type="text" name="lastName" value={selectedPatient.lastName} onChange={handleEditChange} required />
+              <input type="date" name="dob" value={selectedPatient.dob} onChange={handleEditChange} required />
+              <select name="gender" value={selectedPatient.gender} onChange={handleEditChange} required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+              <input type="text" name="phone" value={selectedPatient.phone} onChange={handleEditChange} required />
+              <input type="email" name="email" value={selectedPatient.email} onChange={handleEditChange} required />
+              <textarea name="address" value={selectedPatient.address} onChange={handleEditChange} required />
+              <button onClick={handleUpdatePatient}>Update</button>
+              <button onClick={() => setShowEditModal(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
+
+
         </div>
        </div>
        
