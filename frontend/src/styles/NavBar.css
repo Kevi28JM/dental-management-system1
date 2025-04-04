@@ -34,8 +34,8 @@
   }
   
   .nav-links li a:hover {
-    background-color: white;
-    color: hsl(272, 56%, 46%);
+    background-color:hsl(272, 52%, 35%);
+    color: white;
     text-decoration: none;
   }
   

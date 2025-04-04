@@ -174,7 +174,7 @@ const signup = () => {
                 <input type="text" className="form-control" name="phone" placeholder="Enter telephone number" onChange={handleChange} required />
               </div>
 
-              {/* Email (Optional) */}
+              {/* Email  */}
               <div className="mb-3">
                 <label className="form-label fw-bold">Email (Optional)</label>
                 <input type="email" className="form-control" name="email" placeholder="Enter email (If available)" onChange={handleChange} />
