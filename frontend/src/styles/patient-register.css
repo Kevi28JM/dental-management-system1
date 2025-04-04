@@ -114,10 +114,12 @@ thead {
     width: 400px;
     border-radius: 10px;
     text-align: center;
+    font-size: 15px;
   }
   
   .modal-content h3 {
     color: #2c3e50;
+    font-size: 24px;
   }
   
   .modal-content input,
