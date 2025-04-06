@@ -53,29 +53,26 @@ router.post(
       try {
         // Extract data from request body
         const { name, phone, email, password, role } = req.body;
-  
-        // Check if the phone number is already registered
-        const existingUser = await userModel.findUserByPhone(phone);
-        if (existingUser) {
+        
+        if (role === "patient") {
+          // Check for existing patient by phone
+        const existingPatient = await userModel.findUserByPhone(phone);
+        if (existingPatient) {
           return res.status(400).json({ message: "Phone number already registered" });
         }
-  
-        /*// If the role is 'temporary_patient', create a temporary account
-        if (role === "temporary_patient") {
-          // Temporary patients do not require a password
-          await userModel.createTemporaryPatient(name, phone, email || null,(err, result) => {
-            if (err) {
-              return res.status(500).json({ message: "Error creating temporary account", error: err.message });
-            }
-            return res.status(201).json({ message: "Temporary account created successfully" });
-          });
-        } else { */
+      }else  (role === "assistant" || role === "dentist")
+          // Check for existing assistant or dentist by phone 
+          const existingUser = await userModel.findUserByEmail(email);
+          if (existingUser) {
+            return res.status(400).json({ message: "Email already registered" });
+          }
+        
 
           // Hash the password for security (only for regular users)
           const hashedPassword = await bcrypt.hash(password, 10);
   
           // Store user details in the database
-          await userModel.createUser(name, phone, email || null, hashedPassword, role);
+          await userModel.createUser(name, phone, email, hashedPassword, role);
           return res.status(201).json({ message: "User registered successfully" });
         
       } catch (err) {
@@ -87,15 +84,31 @@ router.post(
 
 // Login Route
 router.post("/login", async (req, res) => {
-  const { phone, password,role } = req.body;
+  const { phone,email, password} = req.body;
+  let role = req.body.role?.toLowerCase(); // ✅ Normalize role to lowercase
 
-  if (!phone || !password || !role) {
-      return res.status(400).json({ message: "Phone, password and role required" });
+  if (!password || !role) {
+    return res.status(400).json({ message: "Password and role are required" });
   }
 
   try {
-    const user = await userModel.findUserByPhone(phone,role);
+    let user;
+
+    if (role === "patient") {
+      if (!phone) {
+        return res.status(400).json({ message: "Phone number is required for patient login" });
+      }
+    user = await userModel.findUserByPhone(phone,role);
     console.log("User fetched from DB:", user);
+    } else if (role === "assistant" || role === "dentist") {
+      if (!email) {
+        return res.status(400).json({ message: "Email is required for assistant/dentist login" });
+      }
+      user = await userModel.findUserByEmail(email);
+      console.log("User fetched from DB:", user);
+    } else {
+      return res.status(400).json({ message: "Invalid role" });
+    }
     
     if (!user) {
         console.log("User not found in database.");

@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const login = () => {
   const [role, setRole] = useState(""); // State to store selected role
-  const [formData, setFormData] = useState({ phone: "", password: "" }); // State for user input
+  const [formData, setFormData] = useState({ phone: "",email: "", password: "" }); // State for user input fields
   const router = useRouter(); // Next.js router for redirection
 
   // Handle input field changes
@@ -22,14 +22,36 @@ const login = () => {
   // Handle form submission for login
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
+
+    if (!role) {
+      toast.warn("Please select a role.");
+      return;
+    }
     
     try {
-      const response = await axios.post(`http://localhost:5000/api/users/login`, { role, ...formData });
+      const payload = {
+        role,
+        password: formData.password,
+        ...(role === "Patient" ? { phone: formData.phone } : { email: formData.email })
+      };
+      
+      console.log("Login Payload:", payload);
+
+      const response = await axios.post(`http://localhost:5000/api/users/login`, payload);
 
       if (response.data.success) {
         toast.success("Login successful! Redirecting...", { autoClose: 2000 });
+
         setTimeout(() => {
-          router.push("/dashboard");
+          if (role === "Patient") {
+            router.push("/patient-dashboard");
+          } else if (role === "Assistant") {
+            router.push("/dashboard");
+          } else if (role === "Dentist") {
+            router.push("/dentist-dashboard");
+          } else {
+            toast.error("Unknown role. Cannot redirect.");
+          }
         }, 2000);
       } else {
         toast.error("Invalid credentials. Please try again.");
@@ -48,13 +70,21 @@ const login = () => {
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label className="form-label fw-bold">Role</label>
-            <select className="form-select" onChange={(e) => setRole(e.target.value)} required>
+            <select className="form-select" onChange={(e) => {
+                setRole(e.target.value);
+                setFormData({ phone: "", email: "", password: "" }); // Reset fields
+             }} 
+             required
+             >
               <option value="">Select Role</option>
               <option value="Assistant">Assistant</option>
               <option value="Dentist">Dentist</option>
               <option value="Patient">Patient</option>
             </select>
           </div>
+          
+          {/* Conditionally show phone or email */}
+          {role === "Patient" ? (
           <div className="mb-3">
             <label className="form-label fw-bold">Phone Number</label>
             <input
@@ -62,23 +92,44 @@ const login = () => {
               className="form-control"
               name="phone"
               placeholder="Enter phone number"
+              value={formData.phone}
               onChange={handleChange}
               required
             />
           </div>
 
-          {/* Password input field */}
+        ) : role === "Assistant" || role === "Dentist" ? (
           <div className="mb-3">
-            <label className="form-label fw-bold">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              name="password"
-              placeholder="Enter password"
-              onChange={handleChange}
-              required
-            />
-          </div>
+              <label className="form-label fw-bold">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                placeholder="Enter email address"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          ) : null}
+            
+            {/* Role selection */}
+
+{/* Show password only after role is selected */}
+{role && (
+  <div className="mb-3">
+    <label className="form-label fw-bold">Password</label>
+    <input
+      type="password"
+      className="form-control"
+      name="password"
+      placeholder="Enter password"
+      value={formData.password}
+      onChange={handleChange}
+      required
+    />
+  </div>
+)}
 
           {/* Login button */}
           <button type="submit" className="btn btn-primary w-100">Login</button>

@@ -24,6 +24,7 @@ const signup = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
  //validating form data
   const validateForm = () => {
     if (!role){
@@ -55,10 +56,10 @@ const signup = () => {
       toast.error("Password is required");
       return false;
     }
-    if(role === "Patient" && !accountExists){
+   /* if(role === "Patient" && !accountExists){
       toast.error("Please find your account first");
       return false;
-    }
+    }*/
     /*if(role !== "New Patient (Temporary Account)" && formData.password.length < 8){
       toast.error("Password must be at least 8 characters");
       return false;
@@ -144,6 +145,7 @@ const signup = () => {
 
   return (
     <div className="signup-container">
+    <ToastContainer />
       <div className="signup-card">
         <h3>Sign Up</h3>
         <form onSubmit={handleSignup}>
@@ -176,8 +178,8 @@ const signup = () => {
 
               {/* Email  */}
               <div className="mb-3">
-                <label className="form-label fw-bold">Email (Optional)</label>
-                <input type="email" className="form-control" name="email" placeholder="Enter email (If available)" onChange={handleChange} />
+                <label className="form-label fw-bold">Email</label>
+                <input type="email" className="form-control" name="email" placeholder="Enter email " onChange={handleChange} required/>
               </div>
              
             </>
@@ -200,7 +202,7 @@ const signup = () => {
             </div>
           )}
 
-          {/* Password Field (For all roles except temporary patients) */}
+          {/* Password Field  */}
           {role !== "New Patient (Temporary Account)" && role !== "" && (
             <div className="mb-3">
               <label className="form-label fw-bold">Password</label>

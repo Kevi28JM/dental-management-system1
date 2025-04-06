@@ -13,7 +13,7 @@ const createUser = async (name, phone, email, passwordHash, role) => {
     // Insert new user
     const result = await db.queryDB(
       'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)',
-      [name, phone, email || null, passwordHash, role]
+      [name, phone, email, passwordHash, role]
     );
     return { message: 'User created successfully', userId: result.insertId };
   } catch (error) {
@@ -49,10 +49,12 @@ const findUserByPhone = async (phone,role) => {
   }
 };
 
-// Find user by email (Optional, For login if email is provided)
-const findUserByEmail = async (email) => {
+// Find user by email  
+const findUserByEmail = async (email,role) => {
   try {
-    const result = await db.queryDB('SELECT * FROM users WHERE email = ?', [email]);
+    const result = await db.queryDB('SELECT * FROM users WHERE email = ?', [email,role]);
+    console.log("Database Query Result:", result);
+    // Check if user exists with the provided email
     return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
   } catch (error) {
     console.error('Error finding user by email:', error);
