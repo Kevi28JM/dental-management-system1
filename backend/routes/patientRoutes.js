@@ -17,7 +17,12 @@ router.post("/add", async (req, res) => {  //route to add new patient data.
          firstName, lastName, dob, gender, phone, email, address
     );
     console.log("Patient created:", patient);
-    res.status(201).json({ success: true, message: "Patient created successfully", patient });
+    res.status(201).json({ 
+      success: true, 
+      message: "Patient created successfully", 
+      patientId: patient.patientId,
+      tempPassword: patient.tempPassword // Return raw temp password for assistant to give}) // Send back temp password here
+    });
   } catch (error) {
     console.error("Error creating patient:", error);
     res.status(500).json({ success: false, message: "Error creating patient", error });
@@ -62,6 +67,11 @@ router.put("/update/:id", async (req, res) => {
 
   if (!firstName || !lastName || !dob || !gender || !phone || !address) {
       return res.status(400).json({ message: "All patient fields are required" });
+  }
+
+   // 💡 Format dob to 'YYYY-MM-DD' if it's an ISO string
+   if (dob.includes("T")) {
+    dob = dob.split("T")[0];
   }
 
   try {
