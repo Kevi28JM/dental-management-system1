@@ -63,7 +63,7 @@ router.get("/", async (req, res) => {  //route to fetch all patients from the da
 // Route to update patient details
 router.put("/update/:id", async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, dob, gender, phone, email, address } = req.body;
+  let { firstName, lastName, dob, gender, phone, email, address } = req.body;
 
   if (!firstName || !lastName || !dob || !gender || !phone || !address) {
       return res.status(400).json({ message: "All patient fields are required" });
