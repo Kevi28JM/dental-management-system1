@@ -85,6 +85,9 @@ const signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
+  // ✅ Log the phone number before validation
+  console.log("Phone input:", formData.phone);
+
     if(!validateForm()){
       console.log("Validation failed, signup request not sent.");
       return;   //validate form before proceeding

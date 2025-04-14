@@ -20,6 +20,7 @@ const createPatient = async (firstName,lastName, dob, gender, phone, email, addr
             "INSERT INTO patients (firstName, lastName, dob, gender, phone, email, address, temp_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [firstName, lastName, dob, gender, phone || null, email || null, address, hashedPassword]
         );
+        
         //check if the insert was successful
         //if not, throw an error
         if (!result.insertId) {

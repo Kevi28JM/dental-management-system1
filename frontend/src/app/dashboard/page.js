@@ -40,19 +40,19 @@ const AssistantDashboard = () => {
             <h4>✅ Today’s Tasks</h4>
             <ul>
               <li>☑️ Working on Asla Project</li>
-              <li>☑️ Team Meeting</li>
-              <li>☑️ Doing Research</li>
+               
+              
             </ul>
           </div>
 
           <div className="notifications">
             <h4>🔔 Notifications</h4>
-            <p>Emily assigned you a task.</p>
+             
           </div>
 
           <div className="team-chat">
-            <h4>💬 Team Chat</h4>
-            <p>Hey, how’s the project going?</p>
+             
+             
           </div>
         </section>
       </main>
