@@ -12,17 +12,38 @@ import 'react-toastify/dist/ReactToastify.css';
 const signup = () => {
   // State for user role and form data
   const [role, setRole] = useState("");
+  const [step, setStep] = useState(1); // Step 1: Verify, Step 2: Complete Registration
   const [formData, setFormData] = useState({ 
     name: "", 
     phone: "",
     email: "", 
-    password: "" 
+    password: "",
+    tempPassword: "" 
   });
-  const [accountExists, setAccountExists] = useState(null);
+  //const [accountExists, setAccountExists] = useState(null);
+  
 
   // Handle input field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleVerifyTempPatient = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/users/verify-temp", {
+        patientId: formData.phone,
+        tempPassword: formData.tempPassword,
+      });
+
+      if (response.status === 200) {
+        toast.success("Verified! Please complete your registration.");
+        setStep(2);
+      } else {
+        toast.error("Verification failed.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Verification failed.");
+    }
   };
 
  //validating form data
@@ -31,6 +52,15 @@ const signup = () => {
       toast.error("Please select a role");
       return false
     }
+
+    if (role === "Patient" && step === 1) {
+      if (!formData.patientId || !formData.tempPassword) {
+        toast.error("Patient ID and Temporary Password are required");
+        return false;
+      }
+      return true; // Skip other validations for step 1
+    }
+    
     if (!formData.name.trim()){
       toast.error("Name is required");
       return false;
@@ -81,6 +111,7 @@ const signup = () => {
     }
     return true;
   };
+
   // Handle signup process
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -164,58 +195,61 @@ const signup = () => {
             </select>
           </div>
 
-          {/* Show fields based on role */}
+          {/* Show fields only if a role is selected */}
           {role && (
+           <>
+          {/* Conditional Fields for Patients */}
+          {role === "Patient" && step === 1 && (
             <>
-            {/* Full Name */}
+              <div className="mb-3">
+                <label className="form-label fw-bold">Patient ID</label>
+                <input type="text" className="form-control" name="phone" placeholder="Enter your Patient ID" onChange={handleChange} required />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label fw-bold">Temporary Password</label>
+                <input type="password" className="form-control" name="tempPassword" placeholder="Enter temporary password" onChange={handleChange} required />
+              </div>
+
+              <button type="button" className="btn btn-secondary w-100" onClick={handleVerifyTempPatient}>
+                Verify Account
+              </button>
+            </>
+          )}
+
+          {/* Step 2 for Patient OR any step for Dentist/Assistant */}
+          {((role !== "Patient") || (role === "Patient" && step === 2)) && (
+            <>
               <div className="mb-3">
                 <label className="form-label fw-bold">Full Name</label>
                 <input type="text" className="form-control" name="name" placeholder="Enter your name" onChange={handleChange} required />
               </div>
-              
-              {/* Phone Number (Required) */}
-              <div className="mb-3">
-                <label className="form-label fw-bold">Telephone Number</label>
-                <input type="text" className="form-control" name="phone" placeholder="Enter telephone number" onChange={handleChange} required />
-              </div>
 
-              {/* Email  */}
               <div className="mb-3">
                 <label className="form-label fw-bold">Email</label>
-                <input type="email" className="form-control" name="email" placeholder="Enter email " onChange={handleChange} required/>
+                <input type="email" className="form-control" name="email" placeholder="Enter email" onChange={handleChange} required />
               </div>
-             
-            </>
-          )}
 
-          {/* Find My Account for Existing Patients */}
-          {role === "Patient" && (
-            <div className="mb-3">
-              <button type="button" className="btn btn-secondary w-100" onClick={handleFindAccount}>
-                Find My Account
-              </button>
-            </div>
-          )}
+              <div className="mb-3">
+                <label className="form-label fw-bold">Phone Number</label>
+                <input type="text" className="form-control" name="phone" placeholder="Enter phone number" onChange={handleChange} required />
+              </div>
 
-          {/* Password Field (Only for registered patients who found their account) */}
-          {role === "Patient" && accountExists && (
-            <div className="mb-3">
-              <label className="form-label fw-bold">Create Password</label>
-              <input type="password" className="form-control" name="password" placeholder="Create a password" onChange={handleChange} required />
-            </div>
-          )}
+              <div className="mb-3">
+                <label className="form-label fw-bold">Password</label>
+                <input type="password" className="form-control" name="password" placeholder="Create a password" onChange={handleChange} required />
+              </div>
+           
 
-          {/* Password Field  */}
-          {role !== "New Patient (Temporary Account)" && role !== "" && (
-            <div className="mb-3">
-              <label className="form-label fw-bold">Password</label>
-              <input type="password" className="form-control" name="password" placeholder="Enter password" onChange={handleChange} required />
-            </div>
-          )}
+           
 
           {/* Signup Button */}
           <button type="submit" className="btn btn-primary w-100">Sign Up</button>
-        </form>
+          </>
+          )}
+          </>
+          )}
+       </form>
 
         {/* Login Link  for Assistant, Dentist, and Patient */}
         <p className="login-link mt-3 text-center">

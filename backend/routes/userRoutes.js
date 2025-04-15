@@ -101,6 +101,30 @@ router.post(
     }
   );
 
+
+  // In userRoutes.js
+
+router.post("/verify-temp", async (req, res) => {
+  const { patientId, tempPassword } = req.body;
+
+  try {
+    const patient = await userModel.findPatientById(patientId);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    const isMatch = await bcrypt.compare(tempPassword, patient.temp_password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid temporary password" });
+    }
+
+    return res.status(200).json({ message: "Temporary password is valid", patient });
+  } catch (error) {
+    return res.status(500).json({ message: "Verification failed", error: error.message });
+  }
+});
+
+
 // Login Route
 router.post("/login", async (req, res) => {
   const { phone,email, password} = req.body;
