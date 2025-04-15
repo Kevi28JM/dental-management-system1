@@ -2,7 +2,7 @@ const db = require('./db');
 
 
 // Sign up a new user (Create a new user in the database)
-const createUser = async (name, phone, email, passwordHash, role) => {
+const createUser = async (name, phone, email, passwordHash, role, patient_id = null) => {
   try {
     // Check if user already exists before inserting
     const existingUsers = await db.queryDB('SELECT * FROM users WHERE phone = ?', [phone]);
@@ -12,8 +12,8 @@ const createUser = async (name, phone, email, passwordHash, role) => {
 
     // Insert new user
     const result = await db.queryDB(
-      'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)',
-      [name, phone, email, passwordHash, role]
+      'INSERT INTO users (name, phone, email, password, role, patient_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, phone, email, passwordHash, role, patient_id]
     );
     return { message: 'User created successfully', userId: result.insertId };
   } catch (error) {
@@ -36,6 +36,26 @@ const createTemporaryPatient = (name, phone, email) => {
   });
 };
 */
+
+// ✅ Find patient by patient_id (from `patients` table)
+const findPatientById = (patientId) => {
+  return new Promise((resolve, reject) => {
+    db.query("SELECT * FROM patients WHERE patient_id = ?", [patientId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results[0]);
+    });
+  });
+};
+
+// ✅ Check if a user already exists for a patient_id
+const findUserByPatientId = (patientId) => {
+  return new Promise((resolve, reject) => {
+    db.query("SELECT * FROM users WHERE patient_id = ?", [patientId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results[0]);
+    });
+  });
+};
 
 // Find user by phone number (For login)
 const findUserByPhone = async (phone,role) => {
@@ -67,4 +87,6 @@ module.exports = {
   /*createTemporaryPatient,*/
   findUserByPhone,  // Updated to search by phone
   findUserByEmail,  // Email search still available as optional
+  findPatientById,
+  findUserByPatientId
 };

@@ -50,19 +50,38 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
   
-      try {
-        // Extract data from request body
-        const { name, phone, email, password, role } = req.body;
-        
+      // Extract data from request body
+        const { name, phone, email, password, role, patient_id, temp_password } = req.body;
+
+       try { 
         if (role === "patient") {
-          // Check for existing patient by phone
-        const existingPatient = await userModel.findUserByPhone(phone);
-        if (existingPatient) {
-          return res.status(400).json({ message: "Phone number already registered" });
-        }
-      }else  (role === "assistant" || role === "dentist")
+          if (!patient_id || !temp_password) {
+            return res.status(400).json({ message: "Patient ID and temporary password are required" });
+          }
+  
+          const patient = await userModel.findPatientById(patient_id);
+          if (!patient) {
+            return res.status(400).json({ message: "Invalid Patient ID" });
+          }
+  
+          const isTempPasswordValid = await bcrypt.compare(temp_password, patient.temp_password);
+          if (!isTempPasswordValid) {
+            return res.status(401).json({ message: "Invalid temporary password" });
+          }
+  
+          const existingUser = await userModel.findUserByPatientId(patient_id);
+          if (existingUser) {
+            return res.status(400).json({ message: "User already registered for this Patient ID" });
+          }
+  
+          const hashedPassword = await bcrypt.hash(password, 10);
+          await userModel.createUser(name, phone, email, hashedPassword, role, patient_id);
+  
+          return res.status(201).json({ message: "Signup successful" });
+  
+       }else  (role === "assistant" || role === "dentist")
           // Check for existing assistant or dentist by phone 
-          const existingUser = await userModel.findUserByEmail(email);
+          const existingUser = await userModel.findUserByEmail(email, role);
           if (existingUser) {
             return res.status(400).json({ message: "Email already registered" });
           }
