@@ -1,8 +1,8 @@
 const db= require('./db');//import the database connection
 const bcrypt = require("bcryptjs");//import bcrypt for password hashing
 
-const generateTempPassword = (length =8) => {
-        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!";
+const generateTempPassword = (length =5) => {
+        const chars = "abcdefghijklmnopqrstuvwxyz23456789";
         let password = "";
         for (let i = 0; i < length; i++) {
             password += chars[Math.floor(Math.random() * chars.length)];
@@ -15,7 +15,7 @@ const createPatient = async (firstName,lastName, dob, gender, phone, email, addr
         const tempPassword = generateTempPassword(); //generate a temporary password for the patient
         const hashedPassword = await bcrypt.hash(tempPassword, 10); //hash the temporary password
 
-        //insert new patient into the database (patient id id auto generated)
+        //insert new patient into the database (patient id auto generated)
         const result = await db.queryDB(
             "INSERT INTO patients (firstName, lastName, dob, gender, phone, email, address, temp_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [firstName, lastName, dob, gender, phone || null, email || null, address, hashedPassword]

@@ -2,19 +2,19 @@ const db = require('./db');
 
 
 // Sign up a new user (Create a new user in the database)
-const createUser = async (name, phone, email, passwordHash, role, patient_id = null) => {
+const createUser = async (name, phone, email, passwordHash, role, patientId = null, tempPassword = null) => {
   try {
-    // Check if user already exists before inserting
-    const existingUsers = await db.queryDB('SELECT * FROM users WHERE phone = ?', [phone]);
-    if (existingUsers.length > 0) {
-      throw { message: 'Phone number already registered' };
-    }
+    console.log("Attempting to create user with the following data:");
+    console.log({ name, phone, email, role, patientId });
 
     // Insert new user
     const result = await db.queryDB(
-      'INSERT INTO users (name, phone, email, password, role, patient_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, phone, email, passwordHash, role, patient_id]
+      'INSERT INTO users (name, phone, email, password, role, patient_id, temp_password) VALUES (?, ?, ?, ?, ?, ?, ?)',  // check this
+      [name, phone, email, passwordHash, role, patientId, tempPassword]  // check this
     );
+
+    console.log("User inserted successfully. Inserted ID:", result.insertId);
+    
     return { message: 'User created successfully', userId: result.insertId };
   } catch (error) {
     console.error('Error creating user:', error);
@@ -38,26 +38,50 @@ const createTemporaryPatient = (name, phone, email) => {
 */
 
 // ✅ Find patient by patient_id (from `patients` table)
-const findPatientById = (patientId) => {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM patients WHERE patient_id = ?", [patientId], (err, results) => {
-      if (err) return reject(err);
-      resolve(results[0]);
-    });
-  });
+const findPatientById = async (patientId, role) => {
+  try {
+    console.log("Checking patient by ID:", patientId); // Debug input
+    const result = await db.queryDB("SELECT * FROM patients WHERE id = ?", [patientId, role]);
+    console.log("Database Query Result:", result);
+
+    if (result.length === 0) {
+      console.warn("No patient found with ID:", patientId);
+      return null;
+    }
+
+    console.log("Patient found:", result[0]);
+    return result[0];
+
+  } catch (error) {
+    console.error("Error while fetching patient:", error);
+    throw { message: "Database error while finding patient", error };
+  }
 };
 
-// ✅ Check if a user already exists for a patient_id
-const findUserByPatientId = (patientId) => {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM users WHERE patient_id = ?", [patientId], (err, results) => {
-      if (err) return reject(err);
-      resolve(results[0]);
-    });
-  });
+
+// ✅ Find user by patient_id (from `users` table)
+const findUserByPatientId = async (patientId) => {
+  try {
+    console.log("Checking user linked to patient ID:", patientId); // Debug input
+    const result = await db.queryDB("SELECT * FROM users WHERE patient_id = ?", [patientId]);
+    console.log("Database Query Result:", result);
+
+    if (result.length === 0) {
+      console.warn("No user found linked to patient ID:", patientId);
+      return null;
+    }
+
+    console.log("User found linked to patient ID:", result[0]);
+    return result[0];
+
+  } catch (error) {
+    console.error("Error while fetching user by patient ID:", error);
+    throw { message: "Database error while finding user by patient ID", error };
+  }
 };
 
-// Find user by phone number (For login)
+
+{/*// Find user by phone number (For login)
 const findUserByPhone = async (phone,role) => {
   try {
     const result = await db.queryDB('SELECT * FROM users WHERE phone = ? AND role = ?', [phone,role ]);
@@ -68,11 +92,12 @@ const findUserByPhone = async (phone,role) => {
     throw { message: 'Database error', error };
   }
 };
+*/}
 
 // Find user by email  
 const findUserByEmail = async (email,role) => {
   try {
-    const result = await db.queryDB('SELECT * FROM users WHERE email = ?', [email,role]);
+    const result = await db.queryDB('SELECT * FROM users WHERE email = ? ', [email,role]);
     console.log("Database Query Result:", result);
     // Check if user exists with the provided email
     return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
@@ -85,7 +110,7 @@ const findUserByEmail = async (email,role) => {
 module.exports = {
   createUser,
   /*createTemporaryPatient,*/
-  findUserByPhone,  // Updated to search by phone
+  //findUserByPhone,  // Updated to search by phone
   findUserByEmail,  // Email search still available as optional
   findPatientById,
   findUserByPatientId

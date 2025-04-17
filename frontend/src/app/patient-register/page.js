@@ -50,7 +50,8 @@
       
     };
     
-  
+    // Handle search input change
+    // This function filters the patients based on the search query entered by the user.
     const handleSearch = (e) => {
       setSearchQuery(e.target.value);
     };
@@ -61,22 +62,31 @@
         .includes(searchQuery.toLowerCase())
     );
   
+    // Handle input change for new patient registration
     const handleInputChange = (e) => {
       setNewPatient({ ...newPatient, [e.target.name]: e.target.value });
     };
   
 
+    // Handle input change for editing patient details
     const handleEditChange = (e) => {
       setSelectedPatient({ ...selectedPatient, [e.target.name]: e.target.value });
     };
-    
+
+    // Handle form submission for registering a new patient
     const handleRegisterPatient = async (e) => {
       e.preventDefault();
       try {
         const response = await axios.post("http://localhost:5000/api/patients/add", newPatient);
       
         if (response.status === 201) {
+          const { tempPassword } = response.data;
+
           toast.success("Patient registered successfully!");
+
+          // Show the temp password in a popup or alert (shown only once)
+        alert(`Temporary password for patient: ${tempPassword}`);
+      
           setShowModal(false);
           fetchPatients();
         } else {

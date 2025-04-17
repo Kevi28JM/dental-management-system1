@@ -18,33 +18,54 @@ const signup = () => {
     phone: "",
     email: "", 
     password: "",
-    tempPassword: "" 
+    tempPassword: "",
+    patientId: "" 
   });
   //const [accountExists, setAccountExists] = useState(null);
   
 
+    // ✅ Log the current step on each render
+    console.log("Current step:", step);
+
   // Handle input field changes
   const handleChange = (e) => {
+    console.log("Field changed:", e.target.name, "Value:", e.target.value);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleVerifyTempPatient = async () => {
+    console.log("Initiating temporary password verification...");
+    console.log("Payload being sent:", {
+      patientId: formData.patientId,
+      tempPassword: formData.tempPassword,
+    });
+
     try {
       const response = await axios.post("http://localhost:5000/api/users/verify-temp", {
-        patientId: formData.phone,
+        patientId: formData.patientId,
         tempPassword: formData.tempPassword,
       });
 
+      console.log("Server response:", response);
+
       if (response.status === 200) {
+        console.log("Verification successful. Proceeding to next step.");
         toast.success("Verified! Please complete your registration.");
         setStep(2);
+        console.log("Step set to:", 2);
       } else {
+        console.log("Verification failed. Status code:", response.status);
         toast.error("Verification failed.");
       }
     } catch (error) {
+      console.log("Error during verification:", error);
       toast.error(error.response?.data?.message || "Verification failed.");
     }
   };
+
+
+  // ✅ Log the current step on each render
+  console.log("Current step:", step);
 
  //validating form data
   const validateForm = () => {
@@ -82,7 +103,7 @@ const signup = () => {
       toast.error("Password is required");
       return false;
     }
-    if(role === "Patient" && accountExists && !formData.password){
+    if(role === "Patient"  && !formData.password){
       toast.error("Password is required");
       return false;
     }
@@ -143,10 +164,13 @@ const signup = () => {
         toast.success("Account setup completed! You can now log in.");
       } else {  */
        
-      
+     
+  // ✅ Normalize role to lowercase
+  const normalizedRole = role.toLowerCase(); 
+
     // General Signup Process for Assistant ,Dentist and patients
     try {
-      const response = await axios.post("http://localhost:5000/api/users/signup", { role, ...formData });
+      const response = await axios.post("http://localhost:5000/api/users/signup", { role:normalizedRole, ...formData });
       if (response.status === 201) {
         toast.success("Signup successful! You can now log in.");
         console.log("Signup success:", response.data);
@@ -160,7 +184,11 @@ const signup = () => {
     }
   };
 
-  // Function to check if a patient already has an account
+
+  // ✅ Log the current step on each render
+  console.log("Current step:", step);
+
+  {/*// Function to check if a patient already has an account
   const handleFindAccount = async () => {
     if (role !== "Patient") return; // Prevent running for other roles
     try {
@@ -176,6 +204,7 @@ const signup = () => {
       toast.error("Error verifying account.");
     }
   };
+  */}
 
   return (
     <div className="signup-container">
@@ -203,7 +232,7 @@ const signup = () => {
             <>
               <div className="mb-3">
                 <label className="form-label fw-bold">Patient ID</label>
-                <input type="text" className="form-control" name="phone" placeholder="Enter your Patient ID" onChange={handleChange} required />
+                <input type="text" className="form-control" name="patientId" placeholder="Enter your Patient ID" onChange={handleChange} required />
               </div>
 
               <div className="mb-3">

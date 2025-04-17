@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const login = () => {
   const [role, setRole] = useState(""); // State to store selected role
-  const [formData, setFormData] = useState({ phone: "",email: "", password: "" }); // State for user input fields
+  const [formData, setFormData] = useState({ patientId: "",email: "", password: "" }); // State for user input fields
   const router = useRouter(); // Next.js router for redirection
 
   // Handle input field changes
@@ -32,7 +32,7 @@ const login = () => {
       const payload = {
         role,
         password: formData.password,
-        ...(role === "Patient" ? { phone: formData.phone } : { email: formData.email })
+        ...(role === "Patient" ? { patientId: formData.patientId } : { email: formData.email })
       };
       
       console.log("Login Payload:", payload);
@@ -72,7 +72,7 @@ const login = () => {
             <label className="form-label fw-bold">Role</label>
             <select className="form-select" onChange={(e) => {
                 setRole(e.target.value);
-                setFormData({ phone: "", email: "", password: "" }); // Reset fields
+                setFormData({ patientId: "", email: "", password: "" }); // Reset fields
              }} 
              required
              >
@@ -86,13 +86,13 @@ const login = () => {
           {/* Conditionally show phone or email */}
           {role === "Patient" ? (
           <div className="mb-3">
-            <label className="form-label fw-bold">Phone Number</label>
+            <label className="form-label fw-bold">Patient ID</label>
             <input
               type="text"
               className="form-control"
-              name="phone"
-              placeholder="Enter phone number"
-              value={formData.phone}
+              name="patientId"
+              placeholder="Enter patient ID"
+              value={formData.patientId}
               onChange={handleChange}
               required
             />
