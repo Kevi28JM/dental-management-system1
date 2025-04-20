@@ -1,0 +1,28 @@
+.working-hours-container {
+    max-width: 500px;
+    margin: auto;
+    background: #f7f7f7;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+  
+  .working-hours-form table {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .working-hours-form td {
+    padding: 10px;
+    vertical-align: middle;
+  }
+  
+  .title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .save-btn {
+    width: 100%;
+  }
+  

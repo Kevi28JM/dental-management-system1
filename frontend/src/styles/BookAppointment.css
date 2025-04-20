@@ -1,0 +1,79 @@
+.appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 450px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+}
+
+.appointment-form h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.appointment-form input[type="text"],
+.appointment-form input[type="date"] {
+  padding: 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  font-size: 1rem;
+}
+
+.time-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.slot-btn {
+  margin: 4px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.slot-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.slot-btn.selected {
+  background-color: #2196f3;
+  color: white;
+}
+
+.slot-btn.booked {
+  background-color: #e57373;
+  color: white;
+  cursor: not-allowed;
+}
+
+.slot-btn.my-booking {
+  background-color: #66bb6a;
+  color: white;
+  font-weight: bold;
+   
+}
+
+.submit-btn {
+  padding: 0.8rem;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #1976d2;
+}
