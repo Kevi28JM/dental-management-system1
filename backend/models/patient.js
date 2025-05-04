@@ -77,4 +77,18 @@ const updatePatient = async (id, firstName, lastName, dob, gender, phone, email,
     }
 };
 
-module.exports = {createPatient, getAllPatients, searchPatientsByName, updatePatient};
+
+const getPatientById = async (id) => {
+    try {
+      const result = await db.queryDB("SELECT * FROM patients WHERE id = ?", [id]);
+      return result;
+    } catch (error) {
+      console.error("Error fetching patient by ID:", error);
+      throw { message: "Database error", error };
+    }
+  };
+  
+   
+  
+
+module.exports = {createPatient, getAllPatients, searchPatientsByName, updatePatient,getPatientById,};

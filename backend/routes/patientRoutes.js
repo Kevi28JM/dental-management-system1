@@ -82,5 +82,25 @@ router.put("/update/:id", async (req, res) => {
       res.status(500).json({ success: false, message: "Error updating patient", error });
   }
 });  
+
+
+// Route to get a single patient by ID
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await patientModel.getPatientById(id);
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    res.status(200).json(result[0]); // Send only the first (and should be only) patient object
+  } catch (error) {
+    console.error("Error fetching patient by ID:", error);
+    res.status(500).json({ message: "Error fetching patient", error: error.message });
+  }
+});
+
   
   module.exports = router;

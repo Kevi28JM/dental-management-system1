@@ -99,6 +99,14 @@ const findUserByEmail = async (email,role) => {
   try {
     const result = await db.queryDB('SELECT * FROM users WHERE email = ? ', [email,role]);
     console.log("Database Query Result:", result);
+    
+    if (result.length > 0) {
+      console.log("User ID:", result[0].id);   // This will print 3
+      return result[0];  // Return the user object
+    } else {
+      console.log("No user found");
+      return null;
+    }  // Return the user object
     // Check if user exists with the provided email
     return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
   } catch (error) {

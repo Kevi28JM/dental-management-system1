@@ -42,13 +42,15 @@ const login = () => {
       if (response.data.success) {
         toast.success("Login successful! Redirecting...", { autoClose: 2000 });
 
+        localStorage.setItem("user_id", response.data.user_id);
+
         setTimeout(() => {
           if (role === "Patient") {
             router.push("/patient-dashboard");
           } else if (role === "Assistant") {
             router.push("/dashboard");
           } else if (role === "Dentist") {
-            router.push("/dentist-dashboard");
+            router.push("/DentistDashboard");
           } else {
             toast.error("Unknown role. Cannot redirect.");
           }
