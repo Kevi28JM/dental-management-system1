@@ -118,6 +118,24 @@ router.post("/add", async (req, res) => {
   }
 });
 
+// dentistRoutes.js
+router.get('/profile/:user_id', async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const sql = 'SELECT * FROM dentists WHERE user_id = ?';
+    const values = [user_id];
+    const result = await db.queryDB(sql, values);
+
+    if (result.length > 0) {
+      res.json({ success: true, profile: result[0] });
+    } else {
+      res.json({ success: false, message: 'Profile not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ success: false, message: 'Database error', error });
+  }
+});
 
 
 module.exports = router;
