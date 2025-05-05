@@ -118,7 +118,7 @@ router.post("/add", async (req, res) => {
   }
 });
 
-// dentistRoutes.js
+ 
 router.get('/profile/:user_id', async (req, res) => {
   const { user_id } = req.params;
   try {

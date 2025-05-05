@@ -10,25 +10,32 @@ const DentistAvailability = () => {
   const [startTime, setStartTime] = useState("");
   const [maxAppointments, setMaxAppointments] = useState(1);
 
+  const [dentistId, setDentistId] = useState(null);
+
+  // Check dentistId on page load
   useEffect(() => {
-    const dentistId = localStorage.getItem("dentistId");
-    if (!dentistId) {
+    const storedDentistId = localStorage.getItem("dentistId");
+    setDentistId(storedDentistId);
+
+    if (!storedDentistId || storedDentistId === "null" || storedDentistId.trim() === "") {
       alert("Please complete your profile before marking availability.");
       window.location.href = "/DentistProfile";
     }
   }, []);
-  const handleSaveAvailability = async () => {
-    const dentistId = localStorage.getItem("dentistId");
 
-    if (!dentistId) {
+  const handleSaveAvailability = async () => {
+    const storedDentistId = localStorage.getItem("dentistId");
+
+     // Ensure dentistId exists before saving
+     if (!storedDentistId || storedDentistId === "null" || storedDentistId.trim() === "") {
       alert("Please complete your profile before marking availability.");
-      window.location.href = "/dentistProfile";
+      window.location.href = "/DentistProfile";
       return;
     }
 
     try {
       await addDoc(collection(db, "availabilities"), {
-        dentistId,
+        dentistId: storedDentistId,
         date: selectedDate.toISOString().split("T")[0], // yyyy-mm-dd
         startTime,
         maxAppointments: parseInt(maxAppointments),
