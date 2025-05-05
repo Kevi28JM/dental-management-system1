@@ -42,7 +42,7 @@ const login = () => {
       if (response.data.success) {
         toast.success("Login successful! Redirecting...", { autoClose: 2000 });
 
-        localStorage.setItem("user_id", response.data.user_id);
+        localStorage.setItem("user_id", response.data.user_id); //save the user_id in locat storage
 
         setTimeout(() => {
           if (role === "Patient") {

@@ -32,9 +32,24 @@ function DentistProfile() {  // userId comes from login session
       }
       console.log('Submitting with user_id:', user_id);
 
-    await axios.post('http://localhost:5000/api/dentist/add', { ...form, user_id });
-    alert('Profile saved!');
-  };
+      try {
+        // Send form + user_id to backend
+        const response = await axios.post('http://localhost:5000/api/dentist/add', { ...form, user_id });
+  
+        if (response.data.success) {
+          const dentistId = response.data.dentistId;  // backend must send dentistId in response
+          localStorage.setItem("dentistId", dentistId);  // save dentistId locally
+  
+          alert('Profile saved successfully!');
+          //window.location.href = "/DentistAvailability";  // go to availability page
+        } else {
+          alert('Failed to save profile.');
+        }
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        alert('Error saving profile. Please try again.');
+      }
+    };
 
   return (
     <div className="dentist-profile-container">
