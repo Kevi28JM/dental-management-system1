@@ -1,0 +1,81 @@
+
+.sidebar {
+    width: 220px;
+    background:  hsl(272, 63%, 36%);
+    color: white;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+
+    background-color: #fcfcfc; /* White or any color you prefer */
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-title {
+    color: hsl(272, 62%, 42%);
+    font-size: 18px;
+    font-weight: bold;
+    flex-grow: 1;
+  }
+  .sidebar-logo {
+    width: 70px;
+    height: 60px;
+    margin-left: 10px;
+  }
+  
+  /* Sidebar Menu */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.dashboard-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+.patient-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+.appointment-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+
+.inventory-logo {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+.sidebar-menu li {
+  padding: 15px;
+  border-radius: 0;
+  transition: background 0.3s ease;
+}
+
+.sidebar-menu li a {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  display: block;
+}
+
+.sidebar-menu li:hover {
+  background: #c7b7e2;
+}
+
+/* Highlight Active Page */
+.sidebar-menu .active {
+  background: #463366;
+  font-weight: bold;
+}
