@@ -138,4 +138,22 @@ router.get('/profile/:user_id', async (req, res) => {
 });
 
 
+// GET all dentists
+router.get('/dentists', async (req, res) => {
+  try {
+    const sql = 'SELECT dentist_id, name, specialization FROM dentists';
+    const result = await db.queryDB(sql); // assuming queryDB returns a Promise
+
+    if (result.length > 0) {
+      res.json({ success: true, dentists: result });
+    } else {
+      res.json({ success: false, message: 'No dentists found' });
+    }
+  } catch (error) {
+    console.error('Error fetching dentists:', error);
+    res.status(500).json({ success: false, message: 'Database error', error });
+  }
+});
+
+
 module.exports = router;
