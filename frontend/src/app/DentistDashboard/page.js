@@ -24,7 +24,7 @@ import { usePathname } from "next/navigation"; // Detects current page
       
             <main className="main-content">
               <header className="dashboard-header">
-                <h3>Welcome, Assistant</h3>
+                <h3>Welcome, Dentist</h3>
                  
               </header>
       
