@@ -35,7 +35,7 @@ import 'react-toastify/dist/ReactToastify.css';
   }, []);
 
   const handleChannel = (dentistId) => {
-    router.push(`/view-availability/${dentistId}`);
+    router.push(`/ViewAvailabilitiesPage?dentistId=${dentistId}`);
   };
 
   return (
