@@ -44,6 +44,11 @@ const login = () => {
 
         localStorage.setItem("user_id", response.data.user_id); //save the user_id in locat storage
 
+        // If patient, save patientId too
+       if (role === "Patient" && response.data.patient_id) {
+       localStorage.setItem("patientId", response.data.patient_id);
+        }
+
         setTimeout(() => {
           if (role === "Patient") {
             router.push("/PatientDashboard"); // Redirect to Patient Dashboard
