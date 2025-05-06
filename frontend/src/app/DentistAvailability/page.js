@@ -56,7 +56,12 @@ const DentistAvailability = () => {
     <div>
       <h2>Mark Availability</h2>
       <DatePicker selected={selectedDate} onChange={(date) => setSelectedDate(date)} />
-      <input placeholder="Start Time (eg: 5pm)" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+      <input
+         type="time"
+         value={startTime}
+         onChange={(e) => setStartTime(e.target.value)}
+         required
+        />
       <input type="number" placeholder="Max Appointments" value={maxAppointments} onChange={(e) => setMaxAppointments(e.target.value)} />
       <button onClick={handleSaveAvailability}>Save Availability</button>
     </div>
