@@ -46,7 +46,7 @@ const login = () => {
 
         setTimeout(() => {
           if (role === "Patient") {
-            router.push("/patient-dashboard");
+            router.push("/PatientDashboard"); // Redirect to Patient Dashboard
           } else if (role === "Assistant") {
             router.push("/dashboard");
           } else if (role === "Dentist") {
