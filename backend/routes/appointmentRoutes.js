@@ -33,4 +33,27 @@ router.post('/add', async (req, res) => {
     }
   });
 
+   
+
+// GET appointments by date
+router.get('/byDate/:date', async (req, res) => {
+    const { date } = req.params;
+  
+    try {
+      const sql = `
+        SELECT a.appointmentId, a.date, a.status, d.name AS dentistName
+        FROM appointment a
+        JOIN dentists d ON a.dentistId = d.dentist_id
+        WHERE a.date = ?
+      `;
+      const result = await db.queryDB(sql, [date]);
+  
+      res.json({ success: true, appointments: result });
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      res.status(500).json({ success: false, message: 'Database error', error });
+    }
+  });
+  
+
 module.exports = router;
