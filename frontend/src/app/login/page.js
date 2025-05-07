@@ -43,11 +43,20 @@ const login = () => {
         toast.success("Login successful! Redirecting...", { autoClose: 2000 });
 
         localStorage.setItem("user_id", response.data.user_id); //save the user_id in locat storage
+            // Always log what you're storing (for debugging)
+            console.log("Storing user_id:", response.data.user_id);
 
-        // If patient, save patientId too
-       if (role === "Patient" && response.data.patient_id) {
-       localStorage.setItem("patientId", response.data.patient_id);
-        }
+            // If patient and patient_id is present, store it
+            if (role === "Patient") {
+              console.log("Patient login detected. patient_id:", response.data.patient_id);
+    
+              if (response.data.patient_id) {
+                localStorage.setItem("patientId", response.data.patient_id);
+                console.log("Stored patientId:", response.data.patient_id);
+              } else {
+                console.warn("Warning: patient_id not received in response");
+              }
+            }
 
         setTimeout(() => {
           if (role === "Patient") {
