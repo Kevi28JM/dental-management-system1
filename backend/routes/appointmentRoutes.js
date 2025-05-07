@@ -1,0 +1,36 @@
+const express = require("express");
+const router = express.Router();
+const db = require("../models/db");
+
+// POST add new appointment
+router.post('/add', async (req, res) => {
+    try {
+      const { appointmentId, patientId, dentistId, date } = req.body;
+  
+      // Basic validation
+      if (!appointmentId || !patientId || !dentistId || !date) {
+        return res.status(400).json({ success: false, message: 'All fields are required' });
+      }
+  
+      const sql = `
+        INSERT INTO appointment (appointmentId, patientId, dentistId, date)
+        VALUES (?, ?, ?, ?)
+      `;
+  
+      const params = [appointmentId, patientId, dentistId, date];
+  
+      const result = await db.queryDB(sql, params);
+  
+      if (result.affectedRows > 0) {
+        res.json({ success: true, message: 'Appointment added successfully' });
+      } else {
+        res.json({ success: false, message: 'Failed to add appointment' });
+      }
+  
+    } catch (error) {
+      console.error('Error adding appointment:', error);
+      res.status(500).json({ success: false, message: 'Database error', error });
+    }
+  });
+
+module.exports = router;
