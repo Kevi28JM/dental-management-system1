@@ -11,6 +11,7 @@ function ViewAvailabilitiesPage() {
   const router = useRouter();
   const [availabilities, setAvailabilities] = useState([]);
 
+  // Fetch availabilities for selected dentist
   useEffect(() => {
     const fetchAvailabilities = async () => {
       if (!dentistId) {
@@ -18,6 +19,9 @@ function ViewAvailabilitiesPage() {
         return;
       }
 
+      // Store dentistId in localStorage
+      localStorage.setItem('selectedDentistId', dentistId);
+      
       try {
         const q = query(
           collection(db, 'availabilities'),
@@ -40,9 +44,14 @@ function ViewAvailabilitiesPage() {
     fetchAvailabilities();
   }, [dentistId]);
 
-  const handleBook = (availabilityId) => {
-    router.push(`/book-appointment/${availabilityId}`);
+
+  // Handle booking: redirect to BookAppointmentPage with availabilityId
+  const handleBook = (sessionId) => {
+    router.push(`/BookAppointmentPage?availabilityId=${sessionId}`);
+
   };
+
+   
 
   return (
     <div>
