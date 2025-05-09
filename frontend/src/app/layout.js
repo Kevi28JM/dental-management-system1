@@ -5,8 +5,8 @@ import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 import { ToastContainer } from "react-toastify"; // Import ToastContainer
 import { useEffect } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
-
-
+// app/layout.js
+import { AuthProvider } from "@/context/AuthContext";// ✅ Auth context
 
 
 import "./globals.css"; //Ensure this file exists
@@ -33,8 +33,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <AuthProvider>
         {children}
         <ToastContainer position="top-right" autoClose={5000} />
+        </AuthProvider>
       </body>
     </html>
   );
