@@ -9,10 +9,13 @@ import "@/styles/Login.css"; // Import custom styles
 import { ToastContainer , toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { useAuth } from "@/context/AuthContext"; // ✅ Import context
+
 const login = () => {
   const [role, setRole] = useState(""); // State to store selected role
   const [formData, setFormData] = useState({ patientId: "",email: "", password: "" }); // State for user input fields
   const router = useRouter(); // Next.js router for redirection
+  const { login } = useAuth(); // ✅ Get login function from context
 
   // Handle input field changes
   const handleChange = (e) => {
@@ -42,22 +45,18 @@ const login = () => {
       if (response.data.success) {
         toast.success("Login successful! Redirecting...", { autoClose: 2000 });
 
-        localStorage.setItem("user_id", response.data.user_id); //save the user_id in locat storage
-            // Always log what you're storing (for debugging)
-            console.log("Storing user_id:", response.data.user_id);
+        
+        // ✅ Store all details using context
+        login({
+          user_id: response.data.user_id,
+          patient_id: response.data.patient_id || null, // For non-patient roles, set as null
+          role,
+          token: response.data.token || null, // Optional if you have token in response
+           
+        });
 
-            // If patient and patient_id is present, store it
-            if (role === "Patient") {
-              console.log("Patient login detected. patient_id:", response.data.patient_id);
-    
-              if (response.data.patient_id) {
-                localStorage.setItem("patientId", response.data.patient_id);
-                console.log("Stored patientId:", response.data.patient_id);
-              } else {
-                console.warn("Warning: patient_id not received in response");
-              }
-            }
-
+        console.log("Login Response:", response.data);
+        //Redirect based on role
         setTimeout(() => {
           if (role === "Patient") {
             router.push("/PatientDashboard"); // Redirect to Patient Dashboard
