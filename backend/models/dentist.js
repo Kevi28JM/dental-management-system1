@@ -150,6 +150,7 @@ const getPatientFullDetails = async (patientId) => {
     }
   };
   
+  {/*}
   // Create dentist profile
   const createDentist = async (user_id, name, specialization, phone, email) => {
     try {
@@ -193,8 +194,91 @@ const getPatientFullDetails = async (patientId) => {
       throw { message: "Database error", error };
     }
   };
-  
+  */}
 
+  // Create dentist specialization
+  const createDentist = async (user_id, specialization) => {
+  try {
+    console.log("Saving specialization only...", { user_id, specialization });
+
+    const sql = `
+      INSERT INTO dentists (user_id, specialization)
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE specialization=?
+    `;
+    const values = [user_id, specialization, specialization];
+
+    const result = await db.queryDB(sql, values);
+    console.log("[createDentist] Query result:", result);
+
+    const dentistId = result.insertId;
+    console.log("[createDentist] Dentist ID:", dentistId);
+
+    if (!dentistId) {
+      // Fetch dentist_id if update happened (not insert)
+      const fetchSql = "SELECT dentist_id FROM dentists WHERE user_id = ?";
+      const fetchResult = await db.queryDB(fetchSql, [user_id]);
+      dentistId = fetchResult[0]?.dentist_id || null;
+    }
+
+
+    return {
+      message: "Specialization saved successfully",
+      dentistId: dentistId
+    };
+
+  } catch (error) {
+    console.error("Error creating dentist:", error);
+    throw { message: "Database error", error };
+  }
+};
+
+
+// Get user details (name, phone, email)
+const getUserDetails = async (user_id) => {
+  try {
+    console.log(`[getUserDetails] Fetching user details for id=${user_id}`);
+    const result = await db.queryDB(
+      "SELECT name FROM users WHERE id = ?",
+      [user_id]
+    );
+    console.log("[getUserDetails] Query result:", result);
+
+    if (result.length === 0) {
+      console.log(`[getUserDetails] No user found with id=${user_id}`);
+      return null;
+    }
+    console.log(`[getUserDetails] Fetched details for id=${user_id}`, result[0]);
+    return result[0];  // Return single user object
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    throw { message: "Database error", error };
+  }
+};
+
+
+const getDentistByUserId = async (user_id) => {
+  try {
+    console.log("[getDentistByUserId] Fetching dentist details for user_id=${user_id}");
+    const result = await db.queryDB(
+      "SELECT dentist_id FROM dentists WHERE user_id = ?",
+      [user_id]
+    );
+
+    console.log("[getDentistByUserId] Query result:", result);
+
+    if (result.length === 0) {
+      console.log("[getDentistByUserId] No dentist found for user_id=${user_id}");
+      return null;
+    }
+
+    console.log("[getDentistByUserId] Found dentist for user_id=${user_id}", result[0]);
+    return result[0]; // Return single dentist object (with dentist_id)
+  } catch (error) {
+    console.error("Error fetching dentist by userId:", error);
+    throw { message: "Database error", error };
+  }
+};
 
 
 module.exports = {
@@ -202,5 +286,7 @@ module.exports = {
   saveMultiSessionTreatment,
   getTreatmentHistory,
   getTreatmentSessions,
-  createDentist 
+  createDentist ,
+  getUserDetails,
+  getDentistByUserId
 };
