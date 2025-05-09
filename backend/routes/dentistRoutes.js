@@ -5,6 +5,8 @@ const { getDocs, collection, query, where } = require("firebase/firestore");
 const firebaseDB = require("../firebase"); // Import firebase.js
 const dentistModel = require("../models/dentist");
 
+
+{/*
 // Save a normal treatment
 router.post('/appointments/treatments', async (req, res) => {
   const { patientId, date, time_slot, treatment_notes, prescription } = req.body;
@@ -89,6 +91,8 @@ router.get('/patient-full-details/:patientId', async (req, res) => {
 });
 
 
+
+
 router.post("/add", async (req, res) => {
   console.log("🔹 Received POST /add request for dentist profile");
 
@@ -117,36 +121,46 @@ router.post("/add", async (req, res) => {
     res.status(500).json({ success: false, message: "Error creating dentist", error: error.error.message });
   }
 });
-
+*/}
  
-router.get('/profile/:user_id', async (req, res) => {
+router.get("/profile/:user_id", async (req, res) => {
   const { user_id } = req.params;
+  console.log(`[GET /profile/${user_id}] Fetching dentist profile`);
   try {
-    const sql = 'SELECT * FROM dentists WHERE user_id = ?';
+    const sql = "SELECT * FROM dentists WHERE user_id = ?";
     const values = [user_id];
     const result = await db.queryDB(sql, values);
 
     if (result.length > 0) {
+      console.log(`[GET /profile/${user_id}] Profile found`);
       res.json({ success: true, profile: result[0] });
     } else {
-      res.json({ success: false, message: 'Profile not found' });
+      console.log(`[GET /profile/${user_id}] No profile found`);
+      res.json({ success: false, message: "Profile not found" });
     }
   } catch (error) {
-    console.error('Error fetching profile:', error);
-    res.status(500).json({ success: false, message: 'Database error', error });
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ success: false, message: "Database error", error });
   }
 });
 
 
 // GET all dentists
-router.get('/dentists', async (req, res) => {
+router.get("/dentists", async (req, res) => {
+  console.log('[GET /dentists] Fetching all dentists');
   try {
-    const sql = 'SELECT dentist_id, name, specialization FROM dentists';
-    const result = await db.queryDB(sql); // assuming queryDB returns a Promise
+    const sql = `
+      SELECT d.dentist_id, d.specialization, u.name
+      FROM dentists d
+      JOIN users u ON d.user_id = u.id
+    `;
+    const result = await db.queryDB(sql); // queryDB returns a Promise
 
     if (result.length > 0) {
+      console.log(`[GET /dentists] Found ${result.length} dentists`);
       res.json({ success: true, dentists: result });
     } else {
+      console.log('[GET /dentists] No dentists found');
       res.json({ success: false, message: 'No dentists found' });
     }
   } catch (error) {
@@ -155,5 +169,88 @@ router.get('/dentists', async (req, res) => {
   }
 });
 
+// Route to get dentist details by userId
+router.get('/users/:user_id', async (req, res) => {
+  const user_id = req.params.user_id;
+  console.log(`[GET /users/${user_id}] Fetching user details`);
+  try {
+    const userDetails = await dentistModel.getUserDetails(user_id);
+    if (!userDetails) {
+      console.log(`[GET /users/${user_id}] No user found`);
+      return res.status(404).json({ message: "User not found" });
+    }
+    console.log(`[GET /users/${user_id}] User details found`);
+    res.json({ success: true, profile: userDetails }); 
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch user details", error: error.message });
+  }
+});
+ 
 
+ 
+// Route to add specialization (creates dentist record)
+router.post("/add", async (req, res) => {
+    const { user_id, specialization } = req.body;
+    console.log('[POST /add] Adding specialization:', { user_id, specialization });
+
+
+    if (!user_id || !specialization) {
+      console.log('[POST /add] Missing required fields');
+      return res.status(400).json({ message: "User ID and specialization are required" });
+    }
+
+    try {
+        const result = await dentistModel.createDentist(user_id, specialization);
+        console.log(`[POST /add] Specialization added for user_id=${user_id}, dentist_id=${result.dentistId}`);
+
+        res.status(200).json({ success: true, message: "Specialization added successfully", dentistId: result.dentistId });
+    } catch (error) {
+        console.error("Error adding specialization:", error);
+        res.status(500).json({ success: false, message: "Error saving specialization", error });
+    }
+});
+
+
+// Route to get dentistId by userId
+router.get('/byUser/:user_id', async (req, res) => {
+  const user_id = req.params.user_id;
+  console.log(`[GET /byUser/${user_id}] Fetching dentistId by user_id`);
+
+  try {
+    const dentistDetails = await dentistModel.getDentistByUserId(user_id);
+    if (!dentistDetails) {
+      console.log(`[GET /byUser/${user_id}] No dentist found`);
+      return res.json({ success: false }); // No dentist found
+    }
+
+    console.log(`[GET /byUser/${user_id}] DentistId found: ${dentistDetails.dentist_id}`);
+    res.json({ success: true, dentistId: dentistDetails.dentist_id });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch dentist details",
+      error: error.message,
+    });
+  }
+});
+
+
+{/*}
+// Route to update specialization (if already exists)
+router.put("/update/:user_id", async (req, res) => {
+    const { user_id } = req.params;
+    const { specialization } = req.body;
+
+    if (!specialization) {
+        return res.status(400).json({ message: "Specialization is required" });
+    }
+
+    try {
+        const result = await dentistModel.updateDentistSpecialization(user_id, specialization);
+        res.status(200).json({ success: true, message: result.message });
+    } catch (error) {
+        console.error("Error updating specialization:", error);
+        res.status(500).json({ success: false, message: "Error updating specialization", error });
+    }
+});
+*/}
 module.exports = router;

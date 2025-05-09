@@ -230,7 +230,7 @@ router.post("/login", async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Login successful',
-      token,            //  keep token too — you already generate it
+      token,            //  keep token too — already generate it
       user_id: user.id,
       patient_id: user.patient_id,
       });
