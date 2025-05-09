@@ -81,18 +81,7 @@ const findUserByPatientId = async (patientId) => {
 };
 
 
-{/*// Find user by phone number (For login)
-const findUserByPhone = async (phone,role) => {
-  try {
-    const result = await db.queryDB('SELECT * FROM users WHERE phone = ? AND role = ?', [phone,role ]);
-    console.log("Database Query Result:", result);
-    return result.length > 0 ? result[0] : null; // Return user if found, otherwise null
-  } catch (error) {
-    console.error('Error finding user by phone:', error);
-    throw { message: 'Database error', error };
-  }
-};
-*/}
+ 
 
 // Find user by email  
 const findUserByEmail = async (email,role) => {
@@ -118,7 +107,7 @@ const findUserByEmail = async (email,role) => {
 module.exports = {
   createUser,
   /*createTemporaryPatient,*/
-  //findUserByPhone,  // Updated to search by phone
+   
   findUserByEmail,  // Email search still available as optional
   findPatientById,
   findUserByPatientId
