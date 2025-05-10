@@ -31,8 +31,8 @@ function DentistProfile() {
       getDentistSpecialization(user_id);
      } else {
       console.warn("⚠️ user_id not found in context yet.");
-    }
-  }, [user_id]);  // Run effect when user_id changes
+     }
+   }, [user_id]);  // Run effect when user_id changes
 
   
   
@@ -134,6 +134,7 @@ function DentistProfile() {
   return (
     <div className="dentist-profile-container">
       <DentistSidebar /> {/* Sidebar component */}
+      <main className="profile-content">
       <h2 className="form-title">Dentist Profile</h2>
 
       <div className="profile-card">
@@ -153,21 +154,22 @@ function DentistProfile() {
         </div>
 
          
-
+        <div className="button-group">
         <button type="submit" className="submit-btn">Save Specialization</button>
         <button type="button" className="cancel-btn" onClick={() => setIsEditing(false)}>Cancel</button>
-          </form>
-       
-
+         </div> 
+         </form>
     ) : (
       <div className="profile-details">
             <p><strong>Name:</strong> {form.name}</p>
             <p><strong>Specialization:</strong> {form.specialization}</p> 
-
+          <div className="button-group">
             <button className="edit-btn" onClick={() => setIsEditing(true)}>Edit Specialization</button>
+            </div>
           </div>
         )}
     </div>
+    </main>
     </div>
   );
 }
