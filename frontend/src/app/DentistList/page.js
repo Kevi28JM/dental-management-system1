@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import PatientSidebar from "@/components/PatientSidebar"; // Import the sidebar component
+import "@/styles/DentistList.css"; // Import your CSS file
 
  function DentistListPage() {
   const [dentists, setDentists] = useState([]);
@@ -46,17 +48,23 @@ import "react-toastify/dist/ReactToastify.css";
   };
 
   return (
-    <div>
-      <h1>Available Dentists</h1>
-      {dentists.map((dentist) => (
-        <div key={dentist.dentist_id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px' }}>
-          <h3>{dentist.name}</h3>
-          <p>{dentist.specialization}</p>
-          <button onClick={() => handleChannel(dentist.dentist_id)} style={{ backgroundColor: 'red', color: 'white' }}>
-            Channel
+    <div className="dentist-page-container">
+    <PatientSidebar/> {/* Sidebar component */}
+      <div className="dentist-content">
+        <h1 className="dentist-title">Available Dentists</h1>
+        <div className="dentist-card-container">
+         {dentists.map((dentist) => (
+          <div key={dentist.dentist_id} className="dentist-card">
+             <h3 className="dentist-name">{dentist.name}</h3>
+             <p className="dentist-specialization">{dentist.specialization}</p>
+            <button onClick={() => handleChannel(dentist.dentist_id)} className="channel-btn">
+              Book  
           </button>
         </div>
       ))}
+      </div>
+    </div>
+    <ToastContainer />
     </div>
   );
 }
