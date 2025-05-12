@@ -1,28 +1,63 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import db from "@/firebase";
-import { collection, query, where, getDocs, doc, updateDoc, increment, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useAuth } from "@/context/AuthContext";// Import useAuth
+import { useSearchParams, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import PatientSidebar from "@/components/PatientSidebar"; // Import the sidebar component
+import "@/styles/ViewAvailability.css"; // Import your CSS file
 
 const ViewAvailability = () => {
+  console.log("ViewAvailability component mounted!");
+
+  const { authData } = useAuth();
+  const patientId = authData.patient_id;
+  console.log("Auth data:", authData);
+  console.log("Patient ID:", patientId);
+
+  const searchParams = useSearchParams();
+  const selectedDentistId = Number(searchParams.get('dentistId'));  // ✅ get from URL
+  console.log("Selected Dentist ID from URL:", selectedDentistId,  typeof selectedDentistId);
+
+  const router = useRouter(); // ✅ For navigation
+
   const [availabilities, setAvailabilities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch available slots on page load
+  // Fetch available sessions on page load
   useEffect(() => {
     const fetchAvailabilities = async () => {
+      console.log("Fetching availabilities...");
+
+      if (!selectedDentistId) {
+        console.warn("No dentistId provided in URL. Clearing availabilities.");
+        setAvailabilities([]);
+        setLoading(false);
+        return;
+        }
+
+        setLoading(true);
       try {
         const q = query(
           collection(db, "availabilities"),
-          where("status", "==", "available")
+          where("status", "==", "available"),
+          where("dentistId", "==", selectedDentistId)
         );
+        console.log("Firestore query created:", q);
 
         const querySnapshot = await getDocs(q);
+        console.log(`Found ${querySnapshot.size} availabilities`);
         const results = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
 
-        setAvailabilities(results);
+        // Sort by date (ascending)
+        const sortedResults = [...results].sort((a, b) => new Date(a.date) - new Date(b.date));
+        console.log("Availabilities fetched:", results);
+
+        setAvailabilities(sortedResults);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching availabilities:", error);
@@ -31,91 +66,59 @@ const ViewAvailability = () => {
       }
     };
 
+    console.log("Component mounted or selectedDentistId changed. Triggering fetchAvailabilities...");
     fetchAvailabilities();
-  }, []);
+  }, [selectedDentistId]);// Refetch when dentist is changed
 
-  const handleBook = async (avail) => {
-    const confirm = window.confirm(`Book appointment on ${avail.date} at ${avail.startTime}?`);
-    if (!confirm) return;
+    // ✅ Handle booking: redirect to BookAppointmentPage with availabilityId
+       const handleBook = (availabilityId) => {
+       console.log(`Redirecting to BookAppointmentPage with availabilityId: ${availabilityId}`);
 
-    const patientId = localStorage.getItem("patientId");
-    if (!patientId) {
-      alert("Please log in as a patient to book.");
-      return;
+      if (!patientId) {
+       console.warn("No patient ID found. User must log in as patient.");
+       alert("Please log in as a patient to book.");
+       return;
     }
 
-    const availableSlots = avail.maxAppointments - avail.activeAppointments;
-    if (availableSlots <= 0) {
-      alert("This slot is already full.");
-      return;
-    }
-
-    try {
-      // 1. Add appointment
-      await addDoc(collection(db, "appointments"), {
-        patientId,
-        dentistId: avail.dentistId,
-        date: avail.date,
-        startTime: avail.startTime,
-        createdAt: serverTimestamp(),
-      });
-
-      // 2. Increment activeAppointments
-      const availabilityRef = doc(db, "availabilities", avail.id);
-      await updateDoc(availabilityRef, {
-        activeAppointments: increment(1),
-      });
-
-      alert("Appointment booked successfully!");
-
-      // 3. Refresh availabilities list after booking
-      setAvailabilities(prev =>
-        prev.map(a =>
-          a.id === avail.id
-            ? { ...a, activeAppointments: a.activeAppointments + 1 }
-            : a
-        )
-      );
-    } catch (err) {
-      console.error(err);
-      alert("Error booking appointment");
-    }
-  };
+       router.push(`/BookAppointmentPage?availabilityId=${availabilityId}`);
+    };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Available Appointments</h2>
+    <div className="page-container">
+      <PatientSidebar />
+      <div className="content-container">
+       <h2>Available Appointments</h2>
 
       {loading ? (
         <p>Loading...</p>
       ) : availabilities.length === 0 ? (
-        <p>No available slots.</p>
+        <p>No available sessions for this dentist.</p>
       ) : (
-        <table border="1" cellPadding="8">
+        <div className="table-container">
+        <table className="availability-table">
           <thead>
             <tr>
-              <th>Dentist ID</th>
               <th>Date</th>
               <th>Start Time</th>
               <th>Max Appointments</th>
-              <th>Available Slots</th>
+              <th>Active Appointments</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {availabilities.map(avail => {
               const availableSlots = avail.maxAppointments - avail.activeAppointments;
+              console.log(`Rendering availability: ${avail.id} — Available Slots: ${availableSlots}`);
               return (
-                <tr key={avail.id}>
-                  <td>{avail.dentistId}</td>
+                <tr key={avail.id}> 
                   <td>{avail.date}</td>
                   <td>{avail.startTime}</td>
                   <td>{avail.maxAppointments}</td>
-                  <td>{availableSlots}</td>
+                   <td>{avail.activeAppointments}</td>
                   <td>
                     <button
                       disabled={availableSlots <= 0}
-                      onClick={() => handleBook(avail)}
+                      onClick={() => handleBook(avail.id)}//pass only id
                     >
                       {availableSlots > 0 ? "Book" : "Full"}
                     </button>
@@ -125,8 +128,11 @@ const ViewAvailability = () => {
             })}
           </tbody>
         </table>
+        </div>
       )}
+      </div>
     </div>
+
   );
 };
 
