@@ -1,0 +1,61 @@
+.dentist-page-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.dentist-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.dentist-title {
+  text-align: 2px;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 28px;
+}
+
+.dentist-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.dentist-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  transition: transform 0.2s;
+}
+
+.dentist-card:hover {
+  transform: translateY(-5px);
+}
+
+.dentist-name {
+  margin-left: 2px; /* Adjust if sidebar width changes */
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 23px;
+}
+
+.dentist-specialization {
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.channel-btn {
+  background-color: #007bff;
+  border: none;
+  padding: 10px 15px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.channel-btn:hover {
+  background-color: #0056b3;
+}

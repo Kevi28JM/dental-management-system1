@@ -1,0 +1,88 @@
+.appointments-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.appointments-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f7f9fc;
+}
+
+/* Date Selector */
+.date-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Table */
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.appointments-table th,
+.appointments-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.appointments-table th {
+  background-color:hsl(270, 4%, 35%);
+  color: white;
+}
+
+/* In-progress Row */
+.in-progress-row {
+  background-color: #ffe8a1;
+}
+
+.in-progress-text {
+  font-weight: bold;
+  color: #b36b00;
+  margin-right: 6px;
+}
+
+/* Buttons */
+.btn-refresh {
+  padding: 6px 12px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-refresh:hover {
+  background-color: #005bb5;
+}
+
+.blue-btn, .red-btn, .green-btn, .purple-btn, .gray-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-right: 4px;
+}
+
+.blue-btn { background-color: #007bff; color: white; }
+.blue-btn:hover { background-color: #0056b3; }
+
+.red-btn { background-color: #dc3545; color: white; }
+.red-btn:hover { background-color: #a71d2a; }
+
+.green-btn { background-color: #28a745; color: white; }
+.green-btn:hover { background-color: #1e7e34; }
+
+.purple-btn { background-color: #6f42c1; color: white; }
+.purple-btn:hover { background-color: #4e2a91; }
+
+.gray-btn { background-color: #6c757d; color: white; }
+.gray-btn:hover { background-color: #495057; }

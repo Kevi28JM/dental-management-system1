@@ -1,0 +1,100 @@
+.availability-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.availability-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f7f9fc;
+}
+
+.availability-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.availability-form input,
+.form-datepicker {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn-primary {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #005bb5;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-card {
+  background: rgb(230, 225, 225);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-info span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.session-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit, .btn-delete {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #1e7e34;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #b02a37;
+}
+
+.scrollable-sessions {
+  max-height: 400px; /* adjust height as needed */
+  overflow-y: auto;
+  border: 1px solid #ccc; /* optional, just to visually separate */
+  padding: 8px; /* optional */
+  border-radius: 4px; /* optional */
+}
