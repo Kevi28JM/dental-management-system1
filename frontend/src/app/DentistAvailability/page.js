@@ -21,7 +21,7 @@ const DentistAvailability = () => {
   const [editSessionId, setEditSessionId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [startTime, setStartTime] = useState("16:00");
-  const [maxAppointments, setMaxAppointments] = useState(1);
+  const [maxAppointments, setMaxAppointments] = useState(8); // Default max appointments
 
   //State to store dentistId and availabilities
   const [dentistId, setDentistId] = useState(null);
@@ -147,28 +147,60 @@ const DentistAvailability = () => {
       return;
     }
 
-    const availabilityData = {
-      dentistId: dentistId,
-      date: selectedDate.toISOString().split("T")[0],
-      startTime,
-      maxAppointments: parseInt(maxAppointments),
-      activeAppointments: 0,
-      status: "available",
-      createdAt: serverTimestamp(),
-    };
-
-    console.log("Availability data to save:", availabilityData);
-
-    try {
-      await addDoc(collection(db, "availabilities"), availabilityData);
-      console.log("Availability saved successfully!");
-      alert("Availability saved successfully!");
-      fetchAvailabilities();
-    } catch (error) {
-      console.error("Error adding availability:", error);
-      alert("Error saving availability");
-    }
+   const newAvailability = {
+    dentistId: dentistId,
+    date: selectedDate.toISOString().split("T")[0],
+    startTime,
+    maxAppointments: parseInt(maxAppointments),
+    activeAppointments: 0,
+    status: "available",
+    createdAt: serverTimestamp(),
   };
+
+  try {
+    const q = query(
+      collection(db, "availabilities"),
+      where("dentistId", "==", newAvailability.dentistId),
+      where("date", "==", newAvailability.date)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      // Session exists for the doctor and date → Update
+      const existingDoc = querySnapshot.docs[0];
+      const ref = doc(db, "availabilities", existingDoc.id);
+
+      await updateDoc(ref, {
+        startTime: newAvailability.startTime,
+        maxAppointments: newAvailability.maxAppointments,
+      });
+
+      const bookedPatients = await getBookedPatients(existingDoc.id);
+      if (bookedPatients.length > 0) {
+        notifyPatients(
+          bookedPatients,
+          "Your appointment session has been updated. Please check details."
+        );
+      }
+
+      alert("Availability updated successfully!");
+    } else {
+      // No existing session → Create new
+      await addDoc(collection(db, "availabilities"), newAvailability);
+      alert("Availability saved successfully!");
+}
+    // ✅ Reset the form to defaults
+    setSelectedDate(new Date());
+    setStartTime("16:00");
+    setMaxAppointments(8);
+
+    fetchAvailabilities();// refresh list
+  } catch (error) {
+    console.error("Error saving availability:", error);
+    alert("Error saving availability");
+  }
+};
   
      // Notify patients (dummy - you can replace with real notification later)
   const notifyPatients = (patientIds, message) => {
@@ -202,12 +234,13 @@ const DentistAvailability = () => {
     const newTime = prompt("Enter new start time (HH:mm)", availability.startTime);
     const newMax = prompt("Enter new max appointments", availability.maxAppointments);
     if (newTime && newMax) {
-      const bookedPatients = await getBookedPatients(availability.id);
+      
       const ref = doc(db, "availabilities", availability.id);
       await updateDoc(ref, {
         startTime: newTime,
         maxAppointments: parseInt(newMax),
       });
+      const bookedPatients = await getBookedPatients(availability.id);
       if (bookedPatients.length > 0) {
         notifyPatients(bookedPatients, "Your appointment session has been updated. Please check details.");
       }
@@ -222,21 +255,44 @@ const DentistAvailability = () => {
       <main className="availability-content"> 
       <h2>Mark Availability</h2>
 
-     <div className="availability-form"></div>
-      <DatePicker selected={selectedDate} onChange={(date) => setSelectedDate(date)} className="form-datepicker" />
-      <input
-        type="time"
-        value={startTime}
-        onChange={(e) => setStartTime(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Max Appointments"
-        value={maxAppointments}
-        onChange={(e) => setMaxAppointments(e.target.value)}
-      />
-      <button onClick={handleSaveAvailability}>Save Availability</button>
+            <div className="availability-form">
+              <div className="form-row">
+                <label htmlFor="date">Select Date:</label>
+                <DatePicker
+                  id="date"
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  className="form-datepicker"
+                />
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="start-time">Start Time:</label>
+                <input
+                  id="start-time"
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-row">
+                <label htmlFor="max-appointments">Max Appointments:</label>
+                <input
+                  id="max-appointments"
+                  type="number"
+                  placeholder="Max Appointments"
+                  value={maxAppointments}
+                  onChange={(e) => setMaxAppointments(e.target.value)}
+                />
+              </div>
+            </div>
+
+      <button className="save-button" onClick={handleSaveAvailability}>
+                  Save Availability
+                </button>
+
 
        <hr />
       <h3>Upcoming Sessions</h3>

@@ -1,12 +1,19 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import db from '@/firebase';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';// Import useRouter for navigation
 import axios from 'axios';
+import { useAuth } from '@/context/AuthContext';
+import "@/styles/DentistViewAppointments.css"; // Import your CSS file
+import DentistSidebar from '@/components/DentistSidebar';
 
 function DentistViewAppointments() {
-  const [dentistId, setDentistId] = useState(null);
+  const router = useRouter(); // Initialize router for navigation
+  const { authData } = useAuth(); // Get auth data from context
+  const [dentistId, setDentistId] = useState(null); 
+
   const [selectedDate, setSelectedDate] = useState('');
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,17 +28,35 @@ function DentistViewAppointments() {
     return `${yyyy}-${mm}-${dd}`;
   };
 
-  // Get dentistId + set today's date on load
+   // Set today's date on load
   useEffect(() => {
-    const storedDentistId = localStorage.getItem('dentistId');
-    if (storedDentistId) {
-      setDentistId(storedDentistId);
-      const today = getTodayDate();
-      setSelectedDate(today);
-    } else {
-      toast.error('Dentist not logged in');
-    }
+    const today = getTodayDate();
+    setSelectedDate(today);
   }, []);
+
+   // Fetch dentistId from SQL using userId
+  const fetchDentistIdFromSQL = async (user_id) => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/dentist/byUser/${user_id}`);
+      if (res.status === 200 && res.data.dentistId) {
+        setDentistId(res.data.dentistId);
+        console.log('Fetched dentistId from SQL:', res.data.dentistId);
+      } else {
+        console.error('Dentist not found in SQL for userId:', user_id);
+        toast.error('Dentist record not found');
+      }
+    } catch (error) {
+      console.error('Error fetching dentistId from SQL:', error);
+      toast.error('Failed to fetch dentistId');
+    }
+  };
+
+  // On authData.user_id change → fetch dentistId
+  useEffect(() => {
+    if (authData?.user_id) {
+      fetchDentistIdFromSQL(authData.user_id);
+    }
+  }, [authData]);
 
   // Auto-fetch appointments when dentistId and selectedDate are ready
   useEffect(() => {
@@ -41,6 +66,7 @@ function DentistViewAppointments() {
   }, [dentistId, selectedDate]);
 
   const fetchAppointments = async () => {
+   console.log('Fetching appointments for dentistId:', dentistId, 'and date:', selectedDate);
     setLoading(true);
     try {
       const appointmentsRef = collection(db, 'appointments');
@@ -56,7 +82,15 @@ function DentistViewAppointments() {
         ...doc.data(),
       }));
 
+      console.log('Fetched appointments:', fetchedAppointments);
       setAppointments(fetchedAppointments);
+
+       // ✅ Set inProgress IDs again based on Firestore data
+    const inProgressIds = fetchedAppointments
+      .filter(app => app.status === "inProgress")
+      .map(app => app.id);
+    setInProgressAppointments(inProgressIds);
+
     } catch (error) {
       console.error('Error fetching appointments:', error);
       toast.error('Failed to fetch appointments');
@@ -67,9 +101,20 @@ function DentistViewAppointments() {
 
     // ---- BUTTON ACTIONS ----
 
+  
   const handleAdd = async (appointment) => {
+    console.log('Adding appointment to SQL:', appointment);
     try {
-      // Example SQL API endpoint — adjust as per your Node.js backend route
+      // Check if the appointment already exists in SQL
+      const checkResponse = await axios.get(`http://localhost:5000/api/appointments/check/${appointment.id}`);
+
+      if (checkResponse.data.exists) {
+        console.log('Appointment already exists in SQL:', appointment.id);
+        toast.error('Appointment already exists for this patient on this date.');
+        return;
+      }
+
+      // If no existing appointment, proceed to add
       const response = await axios.post('http://localhost:5000/api/appointments/add', {
         appointmentId: appointment.id,
         patientId: appointment.patientId,
@@ -78,75 +123,87 @@ function DentistViewAppointments() {
       });
 
       if (response.status === 200) {
-        toast.success('Appointment moved to SQL (In Progress)');
+        console.log('Successfully added appointment to SQL');
+
+        // ✅ Mark status in Firestore
+            try {
+        const appointmentRef = doc(db, "appointments", appointment.id);
+        await updateDoc(appointmentRef, { status: "inProgress" });
+        console.log("Firestore status updated to inProgress for:", appointment.id);
+      } catch (err) {
+        console.error("Error updating Firestore status:", err);
+        toast.error("Failed to update Firestore status");
+      }
+
+
+        toast.success("Appointment moved to SQL (In Progress)");
         setInProgressAppointments(prev => [...prev, appointment.id]);
       } else {
-        toast.error('Failed to add to SQL');
+        console.error('Failed response while adding to SQL:', response);
+        toast.error("Failed to add to SQL");
       }
     } catch (error) {
-      console.error('Error adding to SQL:', error);
-      toast.error('Error adding to SQL');
+      console.error("Error adding to SQL:", error);
+      toast.error("Error adding to SQL");
     }
   };
 
+// Remove appointment from Firestore
   const handleRemove = async (appointmentId) => {
+    console.log('Removing appointment:', appointmentId);
     try {
-      await deleteDoc(doc(db, 'appointments', appointmentId));
-      toast.success('Appointment removed');
+      await deleteDoc(doc(db, "appointments", appointmentId));
+      toast.success("Appointment removed");
       setAppointments(prev => prev.filter(app => app.id !== appointmentId));
     } catch (error) {
-      console.error('Error removing appointment:', error);
-      toast.error('Failed to remove appointment');
+      console.error("Error removing appointment:", error);
+      toast.error("Failed to remove appointment");
     }
   };
 
+  //handle tratment and prescription
   const handleTreat = (appointmentId) => {
-    toast.info(`Open treatment form for ${appointmentId}`);
-    // You can redirect or open modal here later
-  };
+  console.log(`Treat button clicked for appointmentId: ${appointmentId}`);
+  const targetUrl = `/TreatmentPage?appointmentId=${appointmentId}`;
+  console.log(`Navigating to: ${targetUrl}`);
+  router.push(targetUrl);
+};
+
 
   const handlePrescription = (appointmentId) => {
+    console.log('Opening prescription form for:', appointmentId);
     toast.info(`Open prescription form for ${appointmentId}`);
     // You can redirect or open modal here later
   };
 
   const handleTreatmentComplete = async (appointmentId) => {
+    console.log('Completing treatment and removing appointment:', appointmentId);
     try {
       await deleteDoc(doc(db, 'appointments', appointmentId));
-      toast.success('Treatment saved and appointment removed');
+      toast.success("Treatment saved and appointment removed");
       setAppointments(prev => prev.filter(app => app.id !== appointmentId));
     } catch (error) {
-      console.error('Error removing after treatment:', error);
-      toast.error('Failed to remove after treatment');
+      console.error("Error removing after treatment:", error);
+      toast.error("Failed to remove after treatment");
     }
   };
 
 
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="appointments-page">
+    <DentistSidebar /> 
+    <main className="appointments-content">
       <h2>View Your Appointments</h2>
 
-      <div style={{ marginBottom: '15px' }}>
-        <label style={{ marginRight: '10px' }}><strong>Select Date:</strong></label>
+      <div className="date-selector">
+        <label><strong>Select Date:</strong></label>
         <input
           type="date"
           value={selectedDate}
           onChange={e => setSelectedDate(e.target.value)}
-          style={{ padding: '5px', marginRight: '10px' }}
         />
-        <button
-          onClick={fetchAppointments}
-          style={{
-            padding: '6px 15px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          Refresh
-        </button>
+        <button onClick={fetchAppointments}>Refresh</button>
       </div>
 
       {loading ? (
@@ -154,53 +211,33 @@ function DentistViewAppointments() {
       ) : appointments.length === 0 ? (
         <p>No appointments found for {selectedDate}.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table className="appointments-table">
           <thead>
-            <tr style={{ backgroundColor: '#f2f2f2' }}>
-              <th style={tableCellStyle}>Patient ID</th>
-              <th style={tableCellStyle}>Patient No</th>
-              <th style={tableCellStyle}>Actions</th>
+            <tr>
+              <th>Patient ID</th>
+              <th>Patient No</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {appointments.map(appointment => {
               const inProgress = inProgressAppointments.includes(appointment.id);
               return (
-                <tr
-                  key={appointment.id}
-                  style={{
-                    backgroundColor: inProgress ? '#ffeeba' : 'white',
-                  }}
-                >
-                  <td style={tableCellStyle}>{appointment.patientId}</td>
-                  <td style={tableCellStyle}>{appointment.patientNumber}</td>
-                  <td style={tableCellStyle}>
+                <tr key={appointment.id} className={inProgress ? "in-progress-row" : ''}>
+                  <td>{appointment.patientId}</td>
+                  <td>{appointment.patientNumber}</td>
+                  <td>
                     {!inProgress ? (
                       <>
-                        <button
-                          onClick={() => handleAdd(appointment)}
-                          style={btnStyle('blue')}
-                        >Add</button>{' '}
-                        <button
-                          onClick={() => handleRemove(appointment.id)}
-                          style={btnStyle('red')}
-                        >Remove</button>
+                        <button className="blue-btn" onClick={() => handleAdd(appointment)}>Add</button>
+                        <button className="red-btn" onClick={() => handleRemove(appointment.id)}>Remove</button>
                       </>
                     ) : (
                       <>
-                        <span style={{ marginRight: '8px', fontWeight: 'bold', color: '#856404' }}>In Progress</span>
-                        <button
-                          onClick={() => handleTreat(appointment.id)}
-                          style={btnStyle('green')}
-                        >Treat</button>{' '}
-                        <button
-                          onClick={() => handlePrescription(appointment.id)}
-                          style={btnStyle('purple')}
-                        >Presc.</button>{' '}
-                        <button
-                          onClick={() => handleTreatmentComplete(appointment.id)}
-                          style={btnStyle('gray')}
-                        >Finish</button>
+                        <span className="in-progress-text">Ongoing treatment</span>
+                        <button className="green-btn" onClick={() => handleTreat(appointment.id)}>Treat</button>
+                        <button className="purple-btn" onClick={() => handlePrescription(appointment.id)}>Presc.</button>
+                        <button className="gray-btn" onClick={() => handleTreatmentComplete(appointment.id)}>Finish</button>
                       </>
                     )}
                   </td>
@@ -210,32 +247,11 @@ function DentistViewAppointments() {
           </tbody>
         </table>
       )}
+    </main>
     </div>
   );
 }
 
-const tableCellStyle = {
-  border: '1px solid #ccc',
-  padding: '8px',
-  textAlign: 'center',
-};
-
-const btnStyle = (color) => {
-  const colors = {
-    blue: '#007bff',
-    red: '#dc3545',
-    green: '#28a745',
-    purple: '#6f42c1',
-    gray: '#6c757d',
-  };
-  return {
-    padding: '5px 10px',
-    backgroundColor: colors[color],
-    color: 'white',
-    border: 'none',
-    cursor: 'pointer',
-    marginRight: '4px',
-  };
-};
+ 
 
 export default DentistViewAppointments;
