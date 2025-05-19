@@ -25,13 +25,13 @@ const AssistSidebar = () => {
             <Link href="/patient-register">
             <img src="/patient_icon.png" alt="patient icon" className="patient-logo"/>  Patient Register</Link>
           </li>
-          <li className={pathname === "/appointments" ? "active" : ""}>
-            <Link href="/appointments">     
+          <li className={pathname === "/AssistDentistList" ? "active" : ""}>
+            <Link href="/AssistDentistList">     
             <img src="/appointment_icon.png" alt="appointment icon" className="appointment-logo"/>  Appointments</Link>
           </li>
           <li className={pathname === "/inventory" ? "active" : ""}>
             <Link href="/inventory"> 
-            <img src="/inventory_icon.png" alt="inventory icon" className="inventory-logo"/>  Inventory</Link>
+            <img src="/inventory_icon.png" alt="inventory icon" className="inventory-logo"/>   </Link>
           </li>
         </ul>
     </aside>
