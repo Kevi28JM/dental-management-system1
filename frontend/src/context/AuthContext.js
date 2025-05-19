@@ -1,6 +1,6 @@
 "use client"; // Next.js client component
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 // Create the context
 const AuthContext = createContext();
@@ -14,14 +14,27 @@ const AuthProvider = ({ children }) => {
     token: null,
   });
 
+
+  // On first load, check if there's saved auth data
+  useEffect(() => {
+    const savedAuth = localStorage.getItem("authData");
+    if (savedAuth) {
+      setAuthData(JSON.parse(savedAuth));
+    }
+  }, []);
+
+
   // Call this after successful login
   const login = ({ user_id, patient_id = null, role, token }) => {
-    setAuthData({ user_id, patient_id, role, token });
+    const newAuthData = { user_id, patient_id, role, token };
+    setAuthData(newAuthData);
+    localStorage.setItem("authData", JSON.stringify(newAuthData));
   };
 
   // Call this to logout user
   const logout = () => {
     setAuthData({ user_id: null, patient_id: null, role: null, token: null });
+    localStorage.removeItem("authData");
   };
 
   return (
