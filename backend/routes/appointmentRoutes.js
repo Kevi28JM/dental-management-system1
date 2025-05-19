@@ -29,7 +29,30 @@ router.post('/add', async (req, res) => {
   }
 });
 
-   
+  
+// GET check if appointment exists by appointmentId
+router.get('/check/:appointmentId', async (req, res) => {
+  const { appointmentId } = req.params;
+
+  if (!appointmentId) {
+    return res.status(400).json({ success: false, message: 'appointmentId is required' });
+  }
+
+  try {
+    const result = await appointmentModel.checkAppointmentExists(appointmentId);
+
+    if (result.length > 0) {
+      res.status(200).json({ success: true, exists: true, appointment: result[0] });
+    } else {
+      res.status(200).json({ success: true, exists: false });
+    }
+
+  } catch (error) {
+    console.error('Error checking appointment:', error);
+    res.status(500).json({ success: false, message: 'Database error', error });
+  }
+});
+
 
 // GET appointments by date
 router.get('/byDate/:date', async (req, res) => {
