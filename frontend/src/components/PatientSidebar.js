@@ -36,11 +36,11 @@ const PatientSidebar = () => {
             <img src="/dashboard_icon.png" alt="dashboard icon" className="dashboard-logo"/>  Dentist Availability</Link>
           </li>
 
-         {/*} <li className={pathname === "/patients" ? "active" : ""}>
-            <Link href="/patient-register">
-            <img src="/patient_icon.png" alt="patient icon" className="patient-logo"/>  Patient Register</Link>
+          <li className={pathname === "/PatientQueueView" ? "active" : ""}>
+            <Link href="/PatientQueueView">
+            <img src="/patient_icon.png" alt="patient icon" className="patient-logo"/>Patient Queue</Link>
           </li>
-          */}
+          
         </ul>
     </aside>
   );
