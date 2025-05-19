@@ -108,9 +108,53 @@ const getMultiSessionRootTreatments = async () => {
 */}
  
 
+// Get all treatments for a specific patientId
+const getTreatmentsByPatientId = async (patientId) => {
+  try {
+    console.log(`🔍 Fetching treatments for patientId: ${patientId}`);
+
+    // Get patient details
+    const patientSql = 'SELECT * FROM patients WHERE id = ?';
+    const patientDetails = await db.queryDB(patientSql, [patientId]);
+
+    if (patientDetails.length === 0) {
+      console.warn(`⚠️ No patient found with ID: ${patientId}`);
+      return { notFound: true };
+    }
+
+    // Get treatments for that patient by joining appointments
+    const treatmentSql = `
+      SELECT 
+        t.treatmentId,
+        t.treatmentType,
+        t.sessionId,
+        t.treatmentDate,
+        t.treatmentNotes,
+        t.payment,
+        a.appointmentId
+      FROM treatments t
+      JOIN appointment a ON a.appointmentId = t.appointmentId
+      WHERE a.patientId = ?
+      ORDER BY t.treatmentDate DESC
+    `;
+
+    const treatments = await db.queryDB(treatmentSql, [patientId]);
+
+    return {
+      patient: patientDetails[0],
+      treatments
+    };
+  } catch (error) {
+    console.error("❌ Error fetching treatments by patientId:", error);
+    throw { message: "Database error", error };
+  }
+};
+
+
 
 module.exports = {
   getTreatmentDataByAppointmentId,
   insertTreatment,
+  getTreatmentsByPatientId,
   //getMultiSessionRootTreatments,
 };

@@ -86,6 +86,34 @@ router.get('/treatment-data/:appointmentId', async (req, res) => {
 });
 
 
+// GET all past treatments by patientId
+router.get('/by-patient/:patientId', async (req, res) => {
+  const { patientId } = req.params;
+  console.log(`📤 GET /treatments/by-patient/${patientId}`);
+
+  if (!patientId || patientId === 'undefined') {
+    return res.status(400).json({ message: 'Invalid patientId' });
+  }
+
+  try {
+    const result = await treatmentModel.getTreatmentsByPatientId(patientId);
+
+    if (result.notFound) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      patient: result.patient,
+      treatments: result.treatments
+    });
+  } catch (error) {
+    console.error('❌ Error in /by-patient route:', error);
+    res.status(500).json({ success: false, message: 'Server error', error });
+  }
+});
+
+
 {/*// GET: All treatments where parentTreatmentId = treatmentId
 router.get('/multi-session/roots', async (req, res) => {
   try {
