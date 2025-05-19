@@ -11,21 +11,53 @@
 
 .availability-form {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px; /* Adjust based on space */
 }
 
-.availability-form input,
-.form-datepicker {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
+
+.form-row label {
+  width: 150px; /* Adjust as needed */
+  font-weight: 500;
+}
+
+.form-row input,
+.form-datepicker {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.save-button {
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 20px;
+}
+
+.save-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: scale(1.03);
+}
+
+.save-button:active {
+  transform: scale(0.98);
+}
+
+
 
 .btn-primary {
   background-color: #0070f3;

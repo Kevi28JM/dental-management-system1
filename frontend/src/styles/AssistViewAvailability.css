@@ -1,0 +1,57 @@
+.table-container {
+  max-height: 500px;  /* You can adjust height here */
+  overflow: auto;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+}
+
+.page-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.content-container {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.availability-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.availability-table th,
+.availability-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.availability-table th {
+  background-color: #e0d9d9;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.availability-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.availability-table button {
+  padding: 6px 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.availability-table button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.availability-table button:hover:not(:disabled) {
+  background-color: #218838;
+}

@@ -1,0 +1,30 @@
+.patient-view {
+  padding: 20px;
+}
+
+.appointments-list {
+  margin-top: 20px;
+}
+
+.appointment-card {
+  background-color: #f8f8f8;
+  border-left: 5px solid #ccc;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.highlight {
+  border-left-color: #007bff;
+  background-color: #eaf4ff;
+}
+
+.you {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.ongoing {
+  color: #d63384;
+  font-weight: bold;
+}
