@@ -32,7 +32,9 @@ app.use("/api/dentist", dentistRoutes);
 const appointmentRoutes = require("./routes/appointmentRoutes");
 app.use("/api/appointments", appointmentRoutes);
 
-
+// Import treatment routes
+const treatmentRoutes = require("./routes/treatmentRoutes");
+app.use("/api/treatments", treatmentRoutes);
 
 const PORT = process.env.PORT || 5000;
 // Start the server
