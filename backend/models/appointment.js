@@ -17,6 +17,24 @@ const addAppointment = async (appointmentId, patientId, dentistId, date) => {
   }
 };
 
-module.exports = {addAppointment,
-    
+
+// Check if appointment exists by appointmentId
+const checkAppointmentExists = async (appointmentId) => {
+  try {
+    const sql = `
+      SELECT * FROM appointment
+      WHERE appointmentId = ?
+    `;
+    const params = [appointmentId];
+    const result = await db.queryDB(sql, params);
+    return result;
+  } catch (error) {
+    console.error("Error checking appointment:", error);
+    throw { message: "Database error", error };
+  }
+};
+
+module.exports = {
+  addAppointment,
+  checkAppointmentExists
 };
