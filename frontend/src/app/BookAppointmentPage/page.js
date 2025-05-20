@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { doc, getDoc, updateDoc, collection, addDoc,deleteDoc,  query, where, getDocs  } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc,deleteDoc,  query, where, getDocs  } from 'firebase/firestore';
 import db from '@/firebase';
 import { toast } from 'react-toastify';
 import { useAuth } from '@/context/AuthContext';// Import useAuth
@@ -19,6 +19,7 @@ function BookAppointmentPage() {
   const [loading, setLoading] = useState(true);
   
  
+
 
   // 1️⃣ Fetch availability session data from Firebase
   useEffect(() => {
@@ -111,6 +112,20 @@ function BookAppointmentPage() {
        console.warn('[handleConfirmBooking] Patient has already booked.');
       return;
     }
+    function formatDateForId(dateObj) {
+  const yyyy = dateObj.getFullYear();
+  const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const dd = String(dateObj.getDate()).padStart(2, '0');
+  const hh = String(dateObj.getHours()).padStart(2, '0');
+  const min = String(dateObj.getMinutes()).padStart(2, '0');
+  const ss = String(dateObj.getSeconds()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+}
+const now = new Date();
+const formattedTimestamp = formatDateForId(now);
+ 
+const patientId = authData.patient_id;
+const appointmentId = `${patientId}_${formattedTimestamp}`;
 
     try {
       // 4️⃣ Calculate patient number (next number in line)
@@ -118,19 +133,26 @@ function BookAppointmentPage() {
       console.log('[handleConfirmBooking] Booking patient number:', patientNumber);
 
       //5️⃣ Save booking in 'appointments' collection
-      const bookingRef = await addDoc(collection(db, 'appointments'), {
-        availabilityId: session.id,
-        dentistId: session.dentistId, 
-        patientId: authData.patient_id,
-        date: session.date,
-        startTime: session.startTime,
-        patientNumber: patientNumber,
-        status: 'booked',
-        createdAt: new Date(),
-      });
-      console.log('[handleConfirmBooking] ✅ Appointment booked with ID:', bookingRef.id);
+      // Format date string to make it valid for Firestore document ID (avoid slashes or colons)
+      //const formattedDate = session.date.replace(/[/]/g, '-');  // e.g., "2025-05-21"
+      //const uniqueAppointmentId = `${authData.patient_id}_${formattedDate}`;
 
-      console.log('Appointment booked with ID:', bookingRef.id);
+
+     await setDoc(doc(db, 'appointments', appointmentId), {
+    availabilityId: session.id,
+    dentistId: session.dentistId,
+    patientId: patientId,
+    date: session.date,
+    startTime: session.startTime,
+    patientNumber: patientNumber,
+    status: 'booked',
+    createdAt: now,
+  });
+
+        console.log('[handleConfirmBooking] ✅ Appointment booked with ID:', appointmentId);
+
+
+      console.log('Appointment booked with ID:', appointmentId);
       
        
 
@@ -144,7 +166,7 @@ function BookAppointmentPage() {
 
       toast.success('Appointment booked successfully!');
       setExistingBooking({
-        id: bookingRef.id,
+        id: appointmentId,
         availabilityId: session.id,
         dentistId: session.dentistId,
         patientId: authData.patient_id,
