@@ -1,6 +1,12 @@
 .patient-view {
-  padding: 20px;
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9f9f9;
 }
+ .container {
+  flex: 1;
+  padding: 20px;
+ }
 
 .appointments-list {
   margin-top: 20px;
