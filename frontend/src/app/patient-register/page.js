@@ -73,9 +73,57 @@
       setSelectedPatient({ ...selectedPatient, [e.target.name]: e.target.value });
     };
 
+
+
+  const validatePatient = (patientData) => {
+  const { firstName, lastName, dob, gender, phone, email, address } = patientData;
+
+  // Name validation (allows letters, spaces, hyphens, and apostrophes)
+  const nameRegex = /^[a-zA-ZÀ-ÿ' -]+$/;
+  
+  if (!firstName.trim()) return "First name is required.";
+  if (!nameRegex.test(firstName)) return "First name contains invalid characters.";
+  
+  if (!lastName.trim()) return "Last name is required.";
+  if (!nameRegex.test(lastName)) return "Last name contains invalid characters.";
+
+  // Date validation
+  if (!dob) return "Date of birth is required.";
+  const birthDate = new Date(dob);
+  const today = new Date();
+  
+  if (birthDate > today) return "Date of birth cannot be in the future.";
+
+  // Gender validation
+  if (!gender) return "Gender is required.";
+
+  // Phone validation (international format support)
+  const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+  if (!phone.trim()) return "Phone number is required.";
+  if (!phoneRegex.test(phone.trim())) return "Please enter a valid phone number.";
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.trim()) return "Email is required.";
+  if (!emailRegex.test(email.trim())) return "Please enter a valid email address.";
+
+  // Address validation
+  if (!address.trim()) return "Address is required.";
+
+  return null; // All good
+};
+
+
     // Handle form submission for registering a new patient
     const handleRegisterPatient = async (e) => {
       e.preventDefault();
+
+       const error = validatePatient(newPatient);
+          if (error) {
+          toast.error(error);
+          return;
+  }
+
       try {
         const response = await axios.post("http://localhost:5000/api/patients/add", newPatient);
       
@@ -103,7 +151,58 @@
         setShowEditModal(true);
   };
 
+
+  const validateEditPatient = (patientData) => {
+  const { firstName, lastName, dob, gender, phone, email, address } = patientData;
+
+  // Name validation (allows letters, spaces, hyphens, and apostrophes)
+  const nameRegex = /^[a-zA-ZÀ-ÿ' -]+$/;
+  
+  if (!firstName?.trim()) return "First name is required.";
+  if (!nameRegex.test(firstName)) return "First name contains invalid characters.";
+  
+  if (!lastName?.trim()) return "Last name is required.";
+  if (!nameRegex.test(lastName)) return "Last name contains invalid characters.";
+
+  // Date validation
+  if (!dob) return "Date of birth is required.";
+  const birthDate = new Date(dob);
+  const today = new Date();
+  
+  if (birthDate > today) return "Date of birth cannot be in the future.";
+
+  // Gender validation
+  if (!gender) return "Gender is required.";
+
+  // Phone validation
+  const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+  if (!phone?.trim()) return "Phone number is required.";
+  if (!phoneRegex.test(phone.trim())) return "Please enter a valid phone number.";
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email?.trim()) return "Email is required.";
+  if (!emailRegex.test(email.trim())) return "Please enter a valid email address.";
+
+  // Address validation
+  if (!address?.trim()) return "Address is required.";
+
+  return null; // All good
+};
+
   const handleUpdatePatient = async () => {
+
+   if (!selectedPatient) {
+    toast.error("No patient selected for update.");
+    return;
+  }
+
+  const error = validateEditPatient(selectedPatient);
+  if (error) {
+    toast.error(error);
+    return;
+  }
+
     try {
       await axios.put(`http://localhost:5000/api/patients/update/${selectedPatient.id}`, selectedPatient);
       toast.success("Patient updated successfully!");
@@ -117,6 +216,7 @@
   
     return (
       <div className="patient-register-container">
+      <ToastContainer /> 
       <AssistSidebar/> {/* Sidebar component */}
 
       {/* Main Content */}
@@ -174,49 +274,284 @@
         </table>
         </div>
 
-        {showModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <h3>Register New Patient</h3>
-              <form onSubmit={handleRegisterPatient}>
-                <input type="text" name="firstName" placeholder="First Name" onChange={handleInputChange} required />
-                <input type="text" name="lastName" placeholder="Last Name" onChange={handleInputChange} required />
-                <input type="date" name="dob" onChange={handleInputChange} required />
-                <select name="gender" onChange={handleInputChange} required>
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-                <input type="text" name="phone" placeholder="Phone Number" onChange={handleInputChange} required />
-                <input type="email" name="email" placeholder="Email" onChange={handleInputChange} required />
-                <textarea name="address" placeholder="Address" onChange={handleInputChange} required />
-                <button type="submit">Register</button>
-                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-              </form>
+      {showModal && (
+  <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+    <div className="modal-dialog modal-sm" role="document">
+      <div className="modal-content p-3">
+        <div className="modal-header py-2">
+          <h5 className="modal-title">Register Patient</h5>
+          {/*<button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>*/}
+        </div>
+        <form onSubmit={handleRegisterPatient} className="modal-body p-2">
+          {/* First Name */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="firstName" className="col-4 col-form-label small">First Name</label>
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="firstName"
+                name="firstName"
+                onChange={handleInputChange}
+                required
+              />
             </div>
           </div>
-        )}
 
-        {showEditModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <h3>Edit Patient</h3>
-              <input type="text" name="firstName" value={selectedPatient.firstName} onChange={handleEditChange} required />
-              <input type="text" name="lastName" value={selectedPatient.lastName} onChange={handleEditChange} required />
-              <input type="date" name="dob" value={selectedPatient.dob} onChange={handleEditChange} required />
-              <select name="gender" value={selectedPatient.gender} onChange={handleEditChange} required>
+          {/* Last Name */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="lastName" className="col-4 col-form-label small">Last Name</label>
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="lastName"
+                name="lastName"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Date of Birth */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="dob" className="col-4 col-form-label small">Date of Birth</label>
+            <div className="col-8">
+              <input
+                type="date"
+                className="form-control form-control-sm"
+                id="dob"
+                name="dob"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Gender */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="gender" className="col-4 col-form-label small">Gender</label>
+            <div className="col-8">
+              <select
+                className="form-select form-select-sm"
+                id="gender"
+                name="gender"
+                onChange={handleInputChange}
+                required
+              >
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
-              <input type="text" name="phone" value={selectedPatient.phone} onChange={handleEditChange} required />
-              <input type="email" name="email" value={selectedPatient.email} onChange={handleEditChange} required />
-              <textarea name="address" value={selectedPatient.address} onChange={handleEditChange} required />
-              <button className="update-btn" onClick={handleUpdatePatient}>Update</button>
-              <button className="cancel-btn" onClick={() => setShowEditModal(false)}>Cancel</button>
             </div>
           </div>
-        )}
+
+          {/* Phone Number */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="phone" className="col-4 col-form-label small">Phone</label>
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="phone"
+                name="phone"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="email" className="col-4 col-form-label small">Email</label>
+            <div className="col-8">
+              <input
+                type="email"
+                className="form-control form-control-sm"
+                id="email"
+                name="email"
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="row align-items-start mb-3">
+            <label htmlFor="address" className="col-4 col-form-label small pt-1">Address</label>
+            <div className="col-8">
+              <textarea
+                className="form-control form-control-sm"
+                id="address"
+                name="address"
+                onChange={handleInputChange}
+                required
+                rows={2}
+              />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="d-flex justify-content-end gap-2">
+            <button type="submit" className="btn btn-sm btn-primary">Register</button>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+        {showEditModal && selectedPatient && (
+  <div className="modal fade show d-block" tabIndex="-1" role="dialog">
+    <div className="modal-dialog modal-sm" role="document">
+      <div className="modal-content p-3">
+        <div className="modal-header py-2">
+          <h5 className="modal-title">Edit Patient</h5>
+        </div>
+        <div className="modal-body p-2">
+          {/* First Name */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="editFirstName" className="col-4 col-form-label small">First Name</label>
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="editFirstName"
+                name="firstName"
+                value={selectedPatient.firstName}
+                onChange={handleEditChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Last Name */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="editLastName" className="col-4 col-form-label small">Last Name</label>
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="editLastName"
+                name="lastName"
+                value={selectedPatient.lastName}
+                onChange={handleEditChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Date of Birth */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="editDob" className="col-4 col-form-label small">Date of Birth</label>
+            <div className="col-8">
+              <input
+                type="date"
+                className="form-control form-control-sm"
+                id="editDob"
+                name="dob"
+                value={selectedPatient.dob}
+                onChange={handleEditChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Gender */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="editGender" className="col-4 col-form-label small">Gender</label>
+            <div className="col-8">
+              <select
+                className="form-select form-select-sm"
+                id="editGender"
+                name="gender"
+                value={selectedPatient.gender}
+                onChange={handleEditChange}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Phone Number */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="editPhone" className="col-4 col-form-label small">Phone</label>
+            <div className="col-8">
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="editPhone"
+                name="phone"
+                value={selectedPatient.phone}
+                onChange={handleEditChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="row align-items-center mb-2">
+            <label htmlFor="editEmail" className="col-4 col-form-label small">Email</label>
+            <div className="col-8">
+              <input
+                type="email"
+                className="form-control form-control-sm"
+                id="editEmail"
+                name="email"
+                value={selectedPatient.email}
+                onChange={handleEditChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="row align-items-start mb-3">
+            <label htmlFor="editAddress" className="col-4 col-form-label small pt-1">Address</label>
+            <div className="col-8">
+              <textarea
+                className="form-control form-control-sm"
+                id="editAddress"
+                name="address"
+                value={selectedPatient.address}
+                onChange={handleEditChange}
+                required
+                rows={2}
+              />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="d-flex justify-content-end gap-2">
+  <button 
+  type="button" 
+  className="btn btn-sm" 
+  style={{ backgroundColor: '#28a745', color: 'white' }}
+  onClick={handleUpdatePatient}
+>
+  Update
+</button>
+  <button 
+    type="button" 
+    className="btn btn-sm btn-secondary" 
+    onClick={() => setShowEditModal(false)}
+  >
+    Cancel
+  </button>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
 
         </div>
