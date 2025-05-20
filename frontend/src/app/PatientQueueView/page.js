@@ -13,6 +13,7 @@ import {
 import db from "@/firebase";
 import "@/styles/PatientQueueView.css";
 import { useAuth } from "@/context/AuthContext";
+import PatientSidebar from "@/components/PatientSidebar"; 
 
 function PatientQueueView() {
   const [date, setDate] = useState("");
@@ -91,6 +92,8 @@ function PatientQueueView() {
 
   return (
     <div className="patient-view">
+    <PatientSidebar/>
+    <div className="container">
       <h2>My Appointment Queue</h2>
       <input
         type="date"
@@ -114,7 +117,7 @@ function PatientQueueView() {
               }`}
             >
               <p><strong>Queue No:</strong> {index + 1}</p>
-              <p><strong>Time:</strong> {app.time}</p>
+               
               <p><strong>Status:</strong> {app.status}</p>
               {app.id === patientAppointmentId && (
                 <p className="you">👉 Your appointment</p>
@@ -126,7 +129,9 @@ function PatientQueueView() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+      </div>
+    
   );
 }
 

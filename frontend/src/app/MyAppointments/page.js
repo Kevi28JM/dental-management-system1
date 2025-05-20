@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import db from "@/firebase";
 import { collection, query, where, getDocs,  deleteDoc,
  doc,} from "firebase/firestore";
+ import PatientSidebar from "@/components/PatientSidebar"; 
+import "@/styles/MyAppointments.css"; // Import your CSS file
  
 
 const MyAppointments = () => {
@@ -68,7 +70,10 @@ const fetchTreatments = async (patientId) => {
 
 
   return (
-    <div style={{ padding: "20px" }}>
+     
+    <div className="my-appointmentsview">
+    <PatientSidebar/>
+    <div className="my-appointments-content">
       <h2>My Appointments</h2>
 
       {loading ? (
@@ -97,7 +102,9 @@ const fetchTreatments = async (patientId) => {
           </tbody>
         </table>
       )}
-    </div>
+         </div>
+      </div>
+    
   );
 };
 
