@@ -1,5 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import '@/styles/AppointmentReport.css'; // Importing the CSS file
+import DentistSidebar from '@/components/DentistSidebar';
 
 const AppointmentReport = () => {
   const [report, setReport] = useState(null);
@@ -15,36 +17,48 @@ const AppointmentReport = () => {
           setError(data.message);
         }
       })
-      .catch(err => setError("Something went wrong"));
+      .catch(() => setError("Something went wrong"));
   }, []);
 
-  if (error) return <div>Error: {error}</div>;
-  if (!report) return <div>Loading...</div>;
+  const formatDate = (isoDate) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(isoDate).toLocaleDateString('en-US', options);
+  };
+
+  if (error) return <div className="error-message">Error: {error}</div>;
+  if (!report) return <div className="loading-message">Loading...</div>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Appointment Revenue Report</h1>
-      <table className="table-auto border w-full">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2">Appointment ID</th>
-            <th className="border px-4 py-2">Date</th>
-            <th className="border px-4 py-2">Payment (Rs)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {report.report.map((row, index) => (
-            <tr key={index}>
-              <td className="border px-4 py-2">{row.appointmentId}</td>
-              <td className="border px-4 py-2">{row.date}</td>
-              <td className="border px-4 py-2">{row.payment.toFixed(2)}</td>
+    <div className="report-container">
+    <DentistSidebar />
+    <div className='report-content'>
+      <h1 className="report-title">Appointment Revenue Report</h1>
+
+      <div className="table-container">
+        <table className="appointment-table">
+          <thead>
+            <tr>
+              <th>Appointment ID</th>
+              <th>Date</th>
+              <th>Payment (Rs)</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-4 font-semibold">
-        Total Appointments: {report.totalAppointments} <br />
-        Total Revenue: Rs {report.totalRevenue.toFixed(2)}
+          </thead>
+          <tbody>
+            {report.report.map((row, index) => (
+              <tr key={index}>
+                <td>{row.appointmentId}</td>
+                <td>{formatDate(row.date)}</td>
+                <td className="amount-cell">{row.payment.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="summary-box">
+        <p>Total Appointments: <strong>{report.totalAppointments}</strong></p>
+        <p>Total Revenue: <strong>Rs {report.totalRevenue.toFixed(2)}</strong></p>
+      </div>
       </div>
     </div>
   );

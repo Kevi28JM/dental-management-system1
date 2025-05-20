@@ -156,3 +156,138 @@ th {
   font-size: 20px;
   color: #555;
 }
+
+  
+
+/* Compact Receipt Styles */
+.receipt-modal {
+  width: 320px; /* Reduced from 500px */
+  max-height: 80vh; /* Reduced from 90vh */
+  background: white;
+  padding: 15px; /* Reduced from 20px */
+  border-radius: 8px;
+  position: relative;
+  overflow-y: auto; /* Ensure scrolling if content is long */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* Reduced from 20px */
+  padding-bottom: 8px; /* Reduced from 10px */
+  border-bottom: 1px solid #eee;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px; /* Reduced from 24px */
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  line-height: 1;
+}
+
+.clinic-info {
+  text-align: center;
+  margin-bottom: 10px; /* Reduced from 20px */
+}
+
+.clinic-info h4 {
+  margin: 0;
+  font-size: 16px; /* Reduced from 20px */
+}
+
+.receipt-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px; /* Reduced from 15px */
+  padding-bottom: 8px; /* Reduced from 15px */
+  border-bottom: 1px dashed #ddd;
+  font-size: 13px; /* Added smaller font */
+}
+
+.patient-info,
+.treatment-info,
+.payment-info {
+  margin-bottom: 10px; /* Reduced from 15px */
+  padding-bottom: 8px; /* Reduced from 15px */
+  border-bottom: 1px dashed #ddd;
+  font-size: 13px; /* Added smaller font */
+}
+
+.patient-info h5,
+.treatment-info h5,
+.payment-info h5 {
+  margin: 8px 0; /* Reduced from default */
+  font-size: 14px; /* Slightly smaller headings */
+}
+
+.payment-info {
+  background: #f9f9f9;
+  padding: 10px; /* Reduced from 15px */
+  border-radius: 4px;
+}
+
+.receipt-footer {
+  text-align: center;
+  margin-top: 10px; /* Reduced from 20px */
+  font-style: italic;
+  color: #555;
+  font-size: 12px; /* Smaller footer text */
+}
+
+.receipt-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px; /* Reduced from 20px */
+  gap: 8px; /* Reduced from 10px */
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding-top: 10px;
+}
+
+.receipt-actions button {
+  flex: 1;
+  padding: 8px; /* Reduced from 10px */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px; /* Smaller button text */
+}
+
+.receipt-actions button:first-child {
+  background-color: #f0f0f0;
+}
+
+.receipt-actions button:last-child {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Print styles remain the same */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .receipt-modal, .receipt-modal * {
+    visibility: visible;
+  }
+  .receipt-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    max-height: none;
+  }
+  .receipt-actions, .close-button {
+    display: none;
+  }
+}

@@ -1,0 +1,10 @@
+.report-container{
+    display: flex;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.report-content{
+  flex: 1;
+  padding: 20px;
+}

@@ -236,7 +236,7 @@ function DentistViewAppointments() {
                       <>
                         <span className="in-progress-text">Ongoing treatment</span>
                         <button className="green-btn" onClick={() => handleTreat(appointment.id)}>Treat</button>
-                        <button className="purple-btn" onClick={() => handlePrescription(appointment.id)}>Presc.</button>
+                         
                         <button className="gray-btn" onClick={() => handleTreatmentComplete(appointment.id)}>Finish</button>
                       </>
                     )}

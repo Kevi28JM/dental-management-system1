@@ -1,11 +1,8 @@
- 
 "use client";
 
-import React, { useEffect, useState, useRef  } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
-//import dynamic from 'next/dynamic';
-//const ReactToPrint = dynamic(() => import('react-to-print'), { ssr: false });
 import "@/styles/TreatmentPage.css";
 
 const TreatmentPage = () => {
@@ -20,10 +17,8 @@ const TreatmentPage = () => {
   const [loading, setLoading] = useState(true);
   const [addingTreatment, setAddingTreatment] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  //const printRef = useRef(); // For printing
-  //const [latestTreatment, setLatestTreatment] = useState(null); // Track latest added treatment
-
-
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const [latestTreatment, setLatestTreatment] = useState(null);
 
   useEffect(() => {
     const fetchTreatmentData = async () => {
@@ -50,19 +45,22 @@ const TreatmentPage = () => {
     try {
       setAddingTreatment(true);
       const res = await axios.post(`http://localhost:5000/api/treatments/${appointmentId}`, {
-       sessionId, description, notes, payment
+        sessionId, description, notes, payment
       });
 
       const newTreatment = res.data;
-      console.log("New Treatment:", newTreatment);
       setTreatments([newTreatment, ...treatments]);
-
-      //setTreatments([res.data, ...treatments]);
+      setLatestTreatment(newTreatment); // Store the latest treatment for receipt
+      
+      // Reset form fields
       setSessionId('');
       setDescription('');
       setNotes('');
       setPayment('');
+      
+      // Close the form modal and open receipt modal
       setIsModalOpen(false);
+      setIsReceiptModalOpen(true);
     } catch (err) {
       console.error("Error adding treatment", err);
       alert("Failed to add treatment");
@@ -70,23 +68,10 @@ const TreatmentPage = () => {
       setAddingTreatment(false);
     }
   };
-//
- {/*const groupedTreatments = treatments.reduce((groups, treatment) => {
-    const groupId = treatment.parentTreatmentId || treatment.treatmentId;
-    if (!groups[groupId]) {
-      groups[groupId] = {
-        treatmentType: treatment.treatmentType,
-        entries: []
-      };
-    }
-    groups[groupId].entries.push(treatment);
-    return groups;
-  }, {});
-*/}
 
   if (loading) return <div>Loading treatment data...</div>;
 
-   return (
+  return (
     <>
       <div className="treatment-container">
         <h2 className="main-title">Treatment Details</h2>
@@ -96,7 +81,7 @@ const TreatmentPage = () => {
           <div className="patient-details">
             <p><strong>Name:</strong> {patient.firstName} {patient.lastName}</p>
             <p><strong>ID:</strong> {patient.id}</p>
-            <p><strong>DOB:</strong> {new Date(patient.dob).toLocaleDateString()}</p>
+            <p><strong>Age:</strong> {new Date().getFullYear() - new Date(patient.dob).getFullYear()}</p>
             <p><strong>Gender:</strong> {patient.gender}</p>
           </div>
         </section>
@@ -107,7 +92,7 @@ const TreatmentPage = () => {
 
         <section className="history-section">
           <h3>Treatment History</h3>
-           {treatments.length === 0 ? (
+          {treatments.length === 0 ? (
             <p className="no-treatments">No previous treatments found.</p>
           ) : (
             <div className="table-container">
@@ -138,13 +123,12 @@ const TreatmentPage = () => {
         </section>
       </div>
 
- 
+      {/* Add Treatment Modal */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Add New Treatment</h3>
             <form onSubmit={(e) => { e.preventDefault(); handleAddTreatment(); }}>
-
               <label>Treatment Type<span className="required">*</span></label>
               <input
                 type="text"
@@ -182,6 +166,46 @@ const TreatmentPage = () => {
                 <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Receipt Modal */}
+      {isReceiptModalOpen && latestTreatment && patient && (
+        <div className="modal-overlay">
+          <div className="modal-content receipt-modal">
+            <h3>Treatment Receipt</h3>
+            <div className="receipt-details">
+              <div className="receipt-header">
+                <h4>Dental Clinic Receipt</h4>
+                <p>Date: {new Date(latestTreatment.treatmentDate).toLocaleDateString()}</p>
+              </div>
+              
+              <div className="patient-info">
+                <h5>Patient Information</h5>
+                <p><strong>Name:</strong> {patient.firstName} {patient.lastName}</p>
+                <p><strong>Patient ID:</strong> {patient.id}</p>
+                <p><strong>Age:</strong> {new Date().getFullYear() - new Date(patient.dob).getFullYear()}</p>
+              </div>
+              
+              <div className="treatment-info">
+                <h5>Treatment Details</h5>
+                <p><strong>Session ID:</strong> {latestTreatment.sessionId}</p>
+                <p><strong>Treatment Type:</strong> {latestTreatment.treatmentType}</p>
+                <p><strong>Notes:</strong> {latestTreatment.treatmentNotes || 'N/A'}</p>
+                <p><strong>Payment Amount:</strong> Rs. {latestTreatment.payment}</p>
+              </div>
+              
+              <div className="receipt-footer">
+                <p>Thank you for choosing our clinic!</p>
+                <p>For any queries, please contact: 012-3456789</p>
+              </div>
+            </div>
+            
+            <div className="modal-buttons">
+              <button onClick={() => setIsReceiptModalOpen(false)}>Close</button>
+              <button onClick={() => window.print()}>Print Receipt</button>
+            </div>
           </div>
         </div>
       )}
