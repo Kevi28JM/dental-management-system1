@@ -29,10 +29,8 @@ const AssistSidebar = () => {
             <Link href="/AssistDentistList">     
             <img src="/appointment_icon.png" alt="appointment icon" className="appointment-logo"/>  Appointments</Link>
           </li>
-          <li className={pathname === "/inventory" ? "active" : ""}>
-            <Link href="/inventory"> 
-            <img src="/inventory_icon.png" alt="inventory icon" className="inventory-logo"/>   </Link>
-          </li>
+          
+          
         </ul>
     </aside>
   );
