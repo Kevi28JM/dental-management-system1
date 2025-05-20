@@ -36,6 +36,10 @@ app.use("/api/appointments", appointmentRoutes);
 const treatmentRoutes = require("./routes/treatmentRoutes");
 app.use("/api/treatments", treatmentRoutes);
 
+// Import report routes
+const reportRoutes = require("./routes/reportRoutes");  
+app.use("/api/reports", reportRoutes);
+
 const PORT = process.env.PORT || 5000;
 // Start the server
 app.listen(PORT, () => {
